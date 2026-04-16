@@ -531,13 +531,17 @@
   </div>
 </div>
 
+<script src="./config.local.js"></script>
+
 <footer>Shadi Planner &mdash; Smart budget wedding planning tool</footer>
 
 <script>
 // ========== State ==========
 let currentBudget = 500000;
 let expenses = JSON.parse(localStorage.getItem('sp_expenses') || '[]');
-let apiKey = localStorage.getItem('sp_google_api_key') || '';
+let apiKey =
+  (typeof window !== 'undefined' && window.SHADI_PLANNER_GOOGLE_API_KEY) ||
+  localStorage.getItem('sp_google_api_key') || '';
 let placesService = null;
 
 // ========== Budget Slider ==========
