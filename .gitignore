@@ -59,6 +59,7 @@ packages/web/agent-orchestrator.yaml
 
 # Local agent orchestrator config (may contain secrets)
 agent-orchestrator.yaml
+shadi-planner/config.local.js
 
 # Agent configuration and activity logs
 .claude/
@@ -69,7 +70,7 @@ agent-orchestrator.yaml
 .DS_Store
 Thumbs.db
 .gstack/
-
 # Local validator smoke-test outputs
 artifacts/validator-runs/
 artifacts/validator-smoke-report.md
+shadi-planner/env.js
