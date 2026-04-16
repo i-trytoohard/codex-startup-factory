@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --paper: #000000;
+  --paper-deep: #16181c;
+  --paper-elevated: #1d1f23;
+  --paper-soft: #202327;
+  --ink-strong: #e7e9ea;
+  --ink-soft: #71767b;
+  --line: rgba(47, 51, 54, 1);
+  --accent: #eff3f4;
+  --accent-strong: #ffffff;
+  --focus: #eff3f4;
+  --shadow-soft: 0 18px 48px rgba(0, 0, 0, 0.38);
+  --accent-progressive: #7dd3a6;
+  --accent-populist: #f4b86a;
+  --accent-future: #74c0fc;
+  --accent-conservative: #ff8c69;
+  --font-display: 'Manrope', 'Segoe UI', sans-serif;
+  --font-body: 'Manrope', 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  color: var(--ink-soft);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  font-weight: 500;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #000000;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(77, 163, 255, 0.24), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(248, 196, 113, 0.12), transparent 26%),
+    #000000;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+#root {
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 18%),
+    transparent;
+}
+
+::selection {
+  background: rgba(239, 243, 244, 0.22);
+  color: #ffffff;
+}
