@@ -1,0 +1,550 @@
+.political-app {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 56px;
+}
+
+.hero-panel,
+.dashboard-card,
+.manifesto-card,
+.insight-card,
+.result-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  background: rgba(10, 14, 20, 0.78);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(18px);
+}
+
+.hero-panel {
+  padding: 32px;
+  background:
+    radial-gradient(circle at top right, rgba(248, 196, 113, 0.2), transparent 26%),
+    radial-gradient(circle at top left, rgba(77, 163, 255, 0.18), transparent 32%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01)),
+    rgba(8, 12, 18, 0.9);
+}
+
+.hero-copy {
+  max-width: 720px;
+}
+
+.eyebrow,
+.meta-pill,
+.dashboard-label,
+.party-family,
+.issue-tag,
+.tone-badge,
+.manifesto-footer,
+.stack-caption,
+.result-match span {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.hero-panel h1,
+.manifesto-card h2,
+.manifesto-card h3,
+.insight-card h2,
+.result-card h2 {
+  margin: 0;
+  color: var(--ink-strong);
+  font-family: 'Fraunces', serif;
+}
+
+.hero-panel h1 {
+  margin-top: 16px;
+  font-size: clamp(3rem, 7vw, 5.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  max-width: 9ch;
+}
+
+.hero-panel p,
+.manifesto-body p,
+.insight-card p,
+.result-card p,
+.dashboard-card p {
+  margin: 0;
+  color: rgba(231, 233, 234, 0.72);
+}
+
+.hero-copy p {
+  margin-top: 16px;
+  max-width: 58ch;
+  font-size: 1.02rem;
+}
+
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.meta-pill {
+  padding: 0.7rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.meta-pill.strong {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.hero-note {
+  margin-top: 18px;
+  max-width: 52ch;
+  font-size: 0.95rem;
+}
+
+.dashboard-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.dashboard-card {
+  padding: 20px;
+}
+
+.dashboard-card strong {
+  display: block;
+  margin-top: 10px;
+  color: #fff;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.dashboard-card p {
+  margin-top: 10px;
+  font-size: 0.92rem;
+}
+
+.progress-bar,
+.axis-bar {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.progress-bar {
+  margin-top: 16px;
+}
+
+.progress-bar span,
+.axis-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #4da3ff, #f8c471);
+}
+
+.experience-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+  gap: 18px;
+  margin-top: 18px;
+  align-items: start;
+}
+
+.deck-column {
+  display: grid;
+  gap: 16px;
+}
+
+.stack-caption {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 0 8px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.stack-caption span:nth-child(2) {
+  text-align: center;
+}
+
+.stack-caption span:last-child {
+  text-align: right;
+}
+
+.card-stack {
+  position: relative;
+  min-height: 660px;
+}
+
+.manifesto-card,
+.result-card {
+  min-height: 660px;
+  padding: 24px;
+}
+
+.manifesto-card {
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.manifesto-card:active {
+  cursor: grabbing;
+}
+
+.manifesto-card-back {
+  position: absolute;
+  inset: 18px 18px 0;
+  min-height: 620px;
+  transform: scale(0.96);
+  opacity: 0.55;
+}
+
+.manifesto-card-front,
+.result-card {
+  position: relative;
+  z-index: 2;
+}
+
+.manifesto-gradient,
+.manifesto-gradient-muted {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top left, rgba(77, 163, 255, 0.28), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(248, 196, 113, 0.24), transparent 24%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 40%);
+  pointer-events: none;
+}
+
+.manifesto-gradient-muted {
+  opacity: 0.7;
+}
+
+.manifesto-back-copy {
+  position: absolute;
+  inset: auto 24px 24px;
+  display: grid;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.manifesto-back-copy strong {
+  color: #fff;
+  font-size: 1.2rem;
+}
+
+.manifesto-header,
+.manifesto-footer,
+.axis-meta,
+.result-match {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+.manifesto-header {
+  position: relative;
+  z-index: 1;
+}
+
+.party-family,
+.issue-tag,
+.tone-badge {
+  color: rgba(255, 255, 255, 0.66);
+}
+
+.manifesto-card h2 {
+  margin-top: 10px;
+  font-size: clamp(1.4rem, 2vw, 1.9rem);
+}
+
+.issue-tag,
+.tone-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.manifesto-body {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  margin-top: 34px;
+}
+
+.manifesto-card h3 {
+  font-size: clamp(2rem, 4vw, 3.3rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  max-width: 11ch;
+}
+
+.manifesto-body p {
+  max-width: 48ch;
+  font-size: 1rem;
+}
+
+.manifesto-body blockquote {
+  margin: 0;
+  padding: 18px 20px;
+  border-left: 3px solid rgba(248, 196, 113, 0.8);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  font-size: 1.12rem;
+  line-height: 1.5;
+}
+
+.promise-list,
+.notes-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.promise-list li,
+.notes-list li {
+  position: relative;
+  padding-left: 20px;
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.promise-list li::before,
+.notes-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.66em;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4da3ff, #f8c471);
+}
+
+.manifesto-footer {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  left: 24px;
+  color: rgba(255, 255, 255, 0.44);
+}
+
+.swipe-indicator {
+  position: absolute;
+  top: 22px;
+  z-index: 3;
+  padding: 0.7rem 0.95rem;
+  border: 2px solid currentColor;
+  border-radius: 14px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+
+.swipe-indicator.visible {
+  opacity: 1;
+}
+
+.swipe-indicator.support {
+  right: 24px;
+  color: #7df2b9;
+}
+
+.swipe-indicator.pass {
+  left: 24px;
+  color: #ff8f8f;
+}
+
+.action-row {
+  display: flex;
+  gap: 12px;
+}
+
+.primary-button,
+.ghost-button {
+  appearance: none;
+  border: 0;
+  border-radius: 18px;
+  padding: 14px 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    background 180ms ease,
+    color 180ms ease;
+}
+
+.primary-button:hover,
+.ghost-button:hover {
+  transform: translateY(-1px);
+}
+
+.primary-button {
+  background: linear-gradient(135deg, #4da3ff, #f8c471);
+  color: #09111a;
+}
+
+.ghost-button {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.primary-button:focus-visible,
+.ghost-button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+.insight-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.insight-card {
+  padding: 24px;
+}
+
+.insight-card.muted {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.insight-card h2,
+.result-card h2 {
+  margin-top: 12px;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  line-height: 1;
+}
+
+.axis-list {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.axis-meta {
+  margin-bottom: 8px;
+}
+
+.axis-meta span {
+  color: rgba(255, 255, 255, 0.74);
+}
+
+.axis-meta strong {
+  color: #fff;
+}
+
+.result-card {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  background:
+    radial-gradient(circle at top left, color-mix(in srgb, var(--result-accent) 28%, transparent), transparent 30%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 40%),
+    rgba(10, 14, 20, 0.82);
+}
+
+.result-leaning {
+  color: color-mix(in srgb, var(--result-accent) 72%, white);
+  font-weight: 700;
+}
+
+.result-match-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.result-match {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.result-match strong,
+.result-match em {
+  color: #fff;
+  font-style: normal;
+}
+
+@media (max-width: 980px) {
+  .experience-grid,
+  .dashboard-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .insight-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .political-app {
+    width: min(100% - 20px, 560px);
+    padding-top: 18px;
+  }
+
+  .hero-panel,
+  .dashboard-card,
+  .manifesto-card,
+  .insight-card,
+  .result-card {
+    border-radius: 24px;
+  }
+
+  .hero-panel,
+  .dashboard-card,
+  .manifesto-card,
+  .insight-card,
+  .result-card {
+    padding: 20px;
+  }
+
+  .card-stack,
+  .manifesto-card,
+  .result-card {
+    min-height: 620px;
+  }
+
+  .manifesto-card-back {
+    inset: 14px 14px 0;
+    min-height: 590px;
+  }
+
+  .manifesto-card h3 {
+    max-width: 12ch;
+  }
+
+  .action-row,
+  .insight-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .action-row {
+    display: grid;
+  }
+}
