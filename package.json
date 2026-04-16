@@ -1,48 +1,30 @@
 {
-  "name": "agent-orchestrator",
-  "version": "0.1.0",
+  "name": "codex-hackathon",
   "private": true,
-  "description": "Orchestrate parallel AI coding agents across any runtime, any repo, any issue tracker",
-  "license": "MIT",
-  "engines": {
-    "node": ">=20.0.0"
-  },
-  "packageManager": "pnpm@9.15.4",
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "agents:validate": "node scripts/validate-agents.mjs",
-    "build": "pnpm -r build",
-    "dev": "pnpm --filter @aoagents/ao-web dev",
-    "discord:fetch-thread": "node scripts/fetch-discord-thread.mjs",
+    "dev": "vite",
+    "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "typecheck": "pnpm -r typecheck",
-    "test": "pnpm -r --filter '!@aoagents/ao-web' test",
-    "test:integration": "pnpm --filter @aoagents/ao-integration-tests test:integration",
-    "launch-video:mvp": "pnpm --filter @aoagents/ao-cli dev launch-video ingest",
-    "clean": "pnpm -r clean",
-    "changeset": "changeset",
-    "version-packages": "changeset version",
-    "release": "pnpm -r build && changeset publish",
-    "prepare": "husky",
-    "postinstall": "node scripts/rebuild-node-pty.js"
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.29.8",
-    "@eslint/js": "^10.0.1",
-    "@types/node": "^25.2.3",
-    "eslint": "^10.0.0",
-    "eslint-config-prettier": "^10.1.8",
-    "husky": "^9.1.7",
-    "istanbul-lib-coverage": "^3.2.2",
-    "prettier": "^3.8.1",
-    "typescript-eslint": "^8.55.0"
-  },
-  "pnpm": {
-    "overrides": {
-      "axios": "^1.15.0"
-    }
+    "@eslint/js": "^9.39.4",
+    "@types/node": "^24.12.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.4.0",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.58.0",
+    "vite": "^8.0.4"
   }
 }

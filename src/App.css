@@ -1,0 +1,570 @@
+.political-app {
+  width: min(100%, 1000px);
+  margin: 0 auto;
+  padding: 28px 18px 40px;
+}
+
+.app-shell {
+  width: min(100%, 430px);
+  margin: 0 auto;
+  padding: 16px;
+  border-radius: 42px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)),
+    rgba(10, 12, 18, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 28px 90px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.tinder-topbar,
+.brand-lockup,
+.topbar-pills,
+.hero-meta,
+.session-strip,
+.manifesto-header,
+.manifesto-footer,
+.axis-meta,
+.result-match {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tinder-topbar,
+.manifesto-header,
+.manifesto-footer,
+.axis-meta,
+.result-match {
+  justify-content: space-between;
+}
+
+.brand-lockup {
+  min-width: 0;
+}
+
+.brand-flame {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fd5068, #ff7854);
+  color: #fff;
+  font-family: 'Fraunces', serif;
+  font-size: 1.2rem;
+  box-shadow: 0 14px 30px rgba(253, 80, 104, 0.35);
+}
+
+.brand-lockup strong {
+  display: block;
+  margin-top: 2px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.eyebrow,
+.meta-pill,
+.session-pill span,
+.party-family,
+.tone-badge,
+.photo-badge,
+.manifesto-footer,
+.stack-caption,
+.result-match span {
+  font-family: var(--font-mono);
+  font-size: 0.69rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.eyebrow {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.meta-pill,
+.session-pill {
+  padding: 0.58rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.meta-pill.strong {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.hero-panel {
+  margin-top: 16px;
+  padding: 12px 2px 6px;
+}
+
+.hero-panel h1,
+.manifesto-card h2,
+.manifesto-card h3,
+.insight-card h2,
+.result-card h2 {
+  margin: 0;
+  color: #fff;
+  font-family: 'Fraunces', serif;
+}
+
+.hero-panel h1 {
+  margin-top: 10px;
+  font-size: clamp(2.4rem, 10vw, 3.4rem);
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+}
+
+.hero-copy p,
+.manifesto-body p,
+.insight-card p,
+.result-card p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.hero-copy p {
+  margin-top: 14px;
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+.hero-meta {
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.hero-note {
+  margin-top: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.session-strip {
+  margin-top: 18px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.session-pill {
+  display: grid;
+  gap: 6px;
+  min-width: 104px;
+}
+
+.session-pill strong {
+  color: #fff;
+  font-size: 1.05rem;
+}
+
+.swipe-stage {
+  margin-top: 18px;
+}
+
+.stack-caption {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-bottom: 10px;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.stack-caption span:nth-child(2) {
+  text-align: center;
+}
+
+.stack-caption span:last-child {
+  text-align: right;
+}
+
+.card-stack {
+  position: relative;
+  min-height: 600px;
+}
+
+.manifesto-card,
+.result-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 600px;
+  padding: 18px;
+  border-radius: 28px;
+  background: #141824;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.32);
+}
+
+.manifesto-card {
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.manifesto-card:active {
+  cursor: grabbing;
+}
+
+.manifesto-card-back {
+  position: absolute;
+  inset: 12px 10px 0;
+  min-height: 584px;
+  opacity: 0.4;
+  transform: scale(0.97);
+}
+
+.manifesto-gradient,
+.manifesto-gradient-muted {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(7, 9, 14, 0.05), rgba(7, 9, 14, 0.86) 64%),
+    radial-gradient(circle at top right, rgba(255, 120, 84, 0.35), transparent 24%),
+    radial-gradient(circle at top left, rgba(253, 80, 104, 0.32), transparent 30%),
+    linear-gradient(140deg, #1d2130, #0f1320 72%);
+}
+
+.manifesto-gradient-muted {
+  opacity: 0.6;
+}
+
+.manifesto-photo-layer {
+  position: relative;
+  height: 250px;
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.45)),
+    radial-gradient(circle at 18% 18%, rgba(255, 204, 185, 0.24), transparent 18%),
+    radial-gradient(circle at 80% 24%, rgba(255, 131, 154, 0.28), transparent 22%),
+    linear-gradient(135deg, #2b3145, #171c2c);
+  box-shadow: inset 0 -80px 100px rgba(0, 0, 0, 0.3);
+}
+
+.photo-badge,
+.photo-party {
+  position: absolute;
+  left: 16px;
+  color: #fff;
+}
+
+.photo-badge {
+  top: 16px;
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(10px);
+}
+
+.photo-party {
+  bottom: 18px;
+  max-width: 75%;
+  font-family: 'Fraunces', serif;
+  font-size: 1.7rem;
+  line-height: 1;
+}
+
+.manifesto-back-copy {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  display: grid;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.64);
+}
+
+.manifesto-back-copy strong {
+  color: #fff;
+  font-size: 1.1rem;
+}
+
+.manifesto-header {
+  position: relative;
+  z-index: 1;
+  margin-top: 16px;
+}
+
+.party-family,
+.tone-badge {
+  color: rgba(255, 255, 255, 0.64);
+}
+
+.tone-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.manifesto-card h2 {
+  margin-top: 6px;
+  font-size: 1.25rem;
+}
+
+.manifesto-body {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.manifesto-card h3 {
+  font-size: clamp(2rem, 9vw, 2.8rem);
+  line-height: 0.96;
+  letter-spacing: -0.05em;
+}
+
+.manifesto-body blockquote {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.promise-list,
+.notes-list,
+.bottom-sheet {
+  display: grid;
+  gap: 12px;
+}
+
+.promise-list,
+.notes-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.promise-list li,
+.notes-list li {
+  position: relative;
+  padding-left: 18px;
+  color: rgba(255, 255, 255, 0.84);
+  line-height: 1.45;
+}
+
+.promise-list li::before,
+.notes-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fd5068, #ff7854);
+}
+
+.manifesto-footer {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 16px;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.swipe-indicator {
+  position: absolute;
+  top: 18px;
+  z-index: 3;
+  padding: 0.6rem 0.85rem;
+  border: 3px solid currentColor;
+  border-radius: 16px;
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+
+.swipe-indicator.visible {
+  opacity: 1;
+}
+
+.swipe-indicator.support {
+  right: 18px;
+  color: #81f2b4;
+  transform: rotate(9deg);
+}
+
+.swipe-indicator.pass {
+  left: 18px;
+  color: #6ec7ff;
+  transform: rotate(-9deg);
+}
+
+.tinder-actions {
+  justify-content: center;
+  gap: 18px;
+  margin-top: 16px;
+}
+
+.action-button {
+  appearance: none;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.action-button:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 18px 30px rgba(0, 0, 0, 0.28);
+}
+
+.action-button.dismiss {
+  color: #4da3ff;
+}
+
+.action-button.rewind {
+  width: 52px;
+  height: 52px;
+  margin-top: 6px;
+  color: #f4b86a;
+  font-size: 1rem;
+}
+
+.action-button.approve {
+  color: #fd5068;
+}
+
+.bottom-sheet {
+  margin-top: 18px;
+}
+
+.insight-card,
+.result-card {
+  padding: 18px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.insight-card h2,
+.result-card h2 {
+  margin-top: 10px;
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.axis-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.axis-meta {
+  margin-bottom: 8px;
+}
+
+.axis-meta span {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.axis-meta strong {
+  color: #fff;
+}
+
+.axis-bar {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.axis-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #fd5068, #ff7854);
+}
+
+.result-card {
+  display: grid;
+  gap: 14px;
+  background:
+    radial-gradient(circle at top left, color-mix(in srgb, var(--result-accent) 28%, transparent), transparent 30%),
+    rgba(255, 255, 255, 0.06);
+}
+
+.result-leaning {
+  color: color-mix(in srgb, var(--result-accent) 70%, white);
+  font-weight: 700;
+}
+
+.result-match-list {
+  display: grid;
+  gap: 10px;
+}
+
+.result-match {
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.result-match strong,
+.result-match em {
+  color: #fff;
+  font-style: normal;
+}
+
+.primary-button {
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, #fd5068, #ff7854);
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.primary-button:focus-visible,
+.action-button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+  .political-app {
+    padding: 14px 10px 28px;
+  }
+
+  .app-shell {
+    width: 100%;
+    padding: 14px;
+    border-radius: 28px;
+  }
+
+  .hero-panel h1 {
+    font-size: 2.2rem;
+  }
+
+  .card-stack,
+  .manifesto-card,
+  .result-card {
+    min-height: 560px;
+  }
+
+  .manifesto-photo-layer {
+    height: 220px;
+  }
+}
