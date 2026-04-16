@@ -1073,6 +1073,51 @@ describe("spawn", () => {
     vi.useRealTimers();
   }, 20_000);
 
+  it("supports raw prompt mode without AO coding guidance", async () => {
+    const sm = createSessionManager({ config, registry: mockRegistry });
+
+    await sm.spawn({
+      projectId: "my-app",
+      promptMode: "raw",
+      prompt: "You are Nikola Tesla. Stay in character and wait for the moderator.",
+    });
+
+    expect(mockAgent.getLaunchCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        prompt: "You are Nikola Tesla. Stay in character and wait for the moderator.",
+      }),
+    );
+    expect(mockAgent.getLaunchCommand).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        prompt: expect.stringContaining("ao session claim-pr"),
+      }),
+    );
+  });
+
+  it("persists extra metadata on worker sessions", async () => {
+    const sm = createSessionManager({ config, registry: mockRegistry });
+
+    const session = await sm.spawn({
+      projectId: "my-app",
+      promptMode: "raw",
+      prompt: "Persona prompt",
+      metadata: {
+        workflowType: "podcast",
+        episodeId: "podcast-001",
+        personaName: "Nikola Tesla",
+      },
+    });
+
+    expect(session.metadata["workflowType"]).toBe("podcast");
+    expect(session.metadata["episodeId"]).toBe("podcast-001");
+    expect(session.metadata["personaName"]).toBe("Nikola Tesla");
+
+    const meta = readMetadataRaw(sessionsDir, session.id);
+    expect(meta?.["workflowType"]).toBe("podcast");
+    expect(meta?.["episodeId"]).toBe("podcast-001");
+    expect(meta?.["personaName"]).toBe("Nikola Tesla");
+  });
+
   describe("spawnOrchestrator", () => {
     it("throws when no workspace plugin is configured", async () => {
       const registryNoWorkspace: PluginRegistry = {
@@ -1105,6 +1150,29 @@ describe("spawn", () => {
       expect(session.branch).toBe("orchestrator/app-orchestrator-1");
       expect(session.issueId).toBeNull();
       expect(session.workspacePath).toBe("/tmp/ws");
+    });
+
+    it("persists extra metadata on orchestrator sessions", async () => {
+      const sm = createSessionManager({ config, registry: mockRegistry });
+
+      const session = await sm.spawnOrchestrator({
+        projectId: "my-app",
+        systemPrompt: "You are the instructor.",
+        metadata: {
+          workflowType: "podcast",
+          episodeId: "podcast-001",
+          moderatorRole: "instructor",
+        },
+      });
+
+      expect(session.metadata["workflowType"]).toBe("podcast");
+      expect(session.metadata["episodeId"]).toBe("podcast-001");
+      expect(session.metadata["moderatorRole"]).toBe("instructor");
+
+      const meta = readMetadataRaw(sessionsDir, session.id);
+      expect(meta?.["workflowType"]).toBe("podcast");
+      expect(meta?.["episodeId"]).toBe("podcast-001");
+      expect(meta?.["moderatorRole"]).toBe("instructor");
     });
 
     it("creates a worktree with an orchestrator branch", async () => {

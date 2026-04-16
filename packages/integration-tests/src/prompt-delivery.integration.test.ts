@@ -67,6 +67,16 @@ async function waitForTuiReady(
     // Bail early if OAuth/login screen is showing — TUI won't become ready
     if (/sign in|oauth|Paste code here/i.test(output)) return false;
 
+    // Fresh temp directories can trigger Claude's workspace trust prompt.
+    // Accept it so the test reaches the actual interactive composer.
+    if (/Quick safety check: Is this a project you created or one you trust\?/i.test(output)) {
+      await execFileAsync("tmux", ["send-keys", "-t", sessionName, "Enter"], {
+        timeout: 5_000,
+      });
+      await sleep(2_000);
+      continue;
+    }
+
     // Claude Code shows ❯ when idle, but newer builds may render helper controls
     // underneath it. Treat any idle prompt near the bottom of the pane as ready.
     if (hasIdlePrompt(output)) return true;

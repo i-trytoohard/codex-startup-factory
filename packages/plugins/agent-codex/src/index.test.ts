@@ -520,6 +520,22 @@ describe("isProcessRunning", () => {
     expect(await agent.isProcessRunning(makeTmuxHandle())).toBe(true);
   });
 
+  it("finds codex when launched via a shell wrapper", async () => {
+    mockExecFileAsync.mockImplementation((cmd: string, args: string[]) => {
+      if (cmd === "tmux" && args[0] === "list-panes") {
+        return Promise.resolve({ stdout: "/dev/ttys001\n", stderr: "" });
+      }
+      if (cmd === "ps") {
+        return Promise.resolve({
+          stdout: "  PID TT ARGS\n  100 ttys001  -zsh -c codex exec 'Say hello'\n",
+          stderr: "",
+        });
+      }
+      return Promise.reject(new Error("unexpected"));
+    });
+    expect(await agent.isProcessRunning(makeTmuxHandle())).toBe(true);
+  });
+
   it("does not match similar process names like codex-something", async () => {
     mockExecFileAsync.mockImplementation((cmd: string, args: string[]) => {
       if (cmd === "tmux" && args[0] === "list-panes") {

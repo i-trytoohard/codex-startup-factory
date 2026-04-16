@@ -82,6 +82,38 @@ cd ~/your-project && ao start
 
 That's it. The dashboard opens at `http://localhost:3000` and the orchestrator agent starts managing your project.
 
+## Podcast Workflow
+
+AO also supports a persona-driven podcast workflow from the CLI:
+
+```bash
+ao podcast create \
+  --topic "How science changes civilization" \
+  --persona "Nikola Tesla@1899" \
+  --persona "Albert Einstein@1935" \
+  --audience "Curious founders" \
+  --style "debate" \
+  --goal "Make the contrast between invention and theory feel historically grounded"
+```
+
+### What it does right now
+
+- Creates `1` instructor session that moderates the episode and keeps the conversation on topic
+- Creates `2+` persona sessions based on the `--persona` flags you pass
+- Researches each persona from Exa and Firecrawl when API keys are configured, with Wikipedia as fallback
+- Writes a research brief and structured research JSON under the AO project data directory before the discussion starts
+- Anchors each persona to an optional timeframe like `Tesla@1899` so the discussion stays historically plausible
+
+For the Einstein/Tesla example above, AO will:
+
+- spawn one instructor session
+- spawn one Nikola Tesla persona session
+- spawn one Albert Einstein persona session
+- build a shared research pack for the episode
+- send the instructor the agenda, persona summaries, and artifact location
+
+The instructor session is the manager. The persona sessions are the speakers.
+
 ### Add more projects
 
 ```bash
