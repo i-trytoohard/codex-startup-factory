@@ -90,6 +90,10 @@ Use this if:
 - You need a reusable non-coding worker persona
 - You want to keep the validator prompt in a versioned markdown file
 
+Detailed guide:
+
+- [idea-validator-3p/README.md](./idea-validator-3p/README.md) explains how the validator works and what the upstream Idea Sourcerer should send.
+
 ## Configuration Tips
 
 1. **Start simple** - Use `simple-github.yaml` as a starting point

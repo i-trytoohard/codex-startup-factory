@@ -4,6 +4,9 @@
 # prompt. The explicit idea payload is still passed at spawn time, for example:
 #
 #   ao spawn --prompt '{"idea_id":"IDEA-123","idea":"One-line idea","source_agent":"idea-sourcerer"}'
+#
+# See examples/idea-validator-3p/README.md for the full workflow, payload
+# expectations, and guidance for the upstream Idea Sourcerer Agent.
 
 defaults:
   runtime: tmux
