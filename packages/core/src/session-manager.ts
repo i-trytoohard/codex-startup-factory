@@ -221,6 +221,22 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+const SESSION_METADATA_KEY_RE = /^[a-zA-Z0-9_-]+$/;
+
+function normalizeSpawnMetadata(metadata: Record<string, string> | undefined): Record<string, string> {
+  if (!metadata) return {};
+
+  const normalized: Record<string, string> = {};
+  for (const [key, value] of Object.entries(metadata)) {
+    if (!SESSION_METADATA_KEY_RE.test(key)) {
+      throw new Error(`Invalid metadata key: ${key}`);
+    }
+    normalized[key] = value;
+  }
+
+  return normalized;
+}
+
 async function getTmuxForegroundCommand(sessionName: string): Promise<string | null> {
   try {
     const { stdout } = await execFileAsync(
@@ -944,6 +960,7 @@ export function createSessionManager(deps: SessionManagerDeps): OpenCodeSessionM
     if (!project) {
       throw new Error(`Unknown project: ${spawnConfig.projectId}`);
     }
+    const extraMetadata = normalizeSpawnMetadata(spawnConfig.metadata);
 
     const selection = resolveAgentSelection({
       role: "worker",
@@ -1065,13 +1082,16 @@ export function createSessionManager(deps: SessionManagerDeps): OpenCodeSessionM
       }
     }
 
-    const composedPrompt = buildPrompt({
-      project,
-      projectId: spawnConfig.projectId,
-      issueId: spawnConfig.issueId,
-      issueContext,
-      userPrompt: spawnConfig.prompt,
-    });
+    const composedPrompt =
+      spawnConfig.promptMode === "raw"
+        ? spawnConfig.prompt
+        : buildPrompt({
+            project,
+            projectId: spawnConfig.projectId,
+            issueId: spawnConfig.issueId,
+            issueContext,
+            userPrompt: spawnConfig.prompt,
+          });
 
     // Get agent launch config and create runtime — clean up workspace on failure
     const opencodeIssueSessionStrategy = project.opencodeIssueSessionStrategy ?? "reuse";
@@ -1094,6 +1114,7 @@ export function createSessionManager(deps: SessionManagerDeps): OpenCodeSessionM
       },
       issueId: spawnConfig.issueId,
       prompt: composedPrompt,
+      systemPrompt: spawnConfig.systemPrompt,
       permissions: selection.permissions,
       model: selection.model,
       subagent: spawnConfig.subagent ?? selection.subagent,
@@ -1156,6 +1177,7 @@ export function createSessionManager(deps: SessionManagerDeps): OpenCodeSessionM
       createdAt: new Date(),
       lastActivityAt: new Date(),
       metadata: {
+        ...extraMetadata,
         ...(reusedOpenCodeSessionId ? { opencodeSessionId: reusedOpenCodeSessionId } : {}),
         ...(spawnConfig.prompt ? { userPrompt: spawnConfig.prompt } : {}),
       },
@@ -1174,6 +1196,7 @@ export function createSessionManager(deps: SessionManagerDeps): OpenCodeSessionM
         runtimeHandle: JSON.stringify(handle),
         opencodeSessionId: reusedOpenCodeSessionId,
         userPrompt: spawnConfig.prompt,
+        ...extraMetadata,
       });
 
       if (plugins.agent.postLaunchSetup) {
@@ -1272,6 +1295,7 @@ export function createSessionManager(deps: SessionManagerDeps): OpenCodeSessionM
     if (!project) {
       throw new Error(`Unknown project: ${orchestratorConfig.projectId}`);
     }
+    const extraMetadata = normalizeSpawnMetadata(orchestratorConfig.metadata);
 
     const selection = resolveAgentSelection({
       role: "orchestrator",
@@ -1469,6 +1493,7 @@ export function createSessionManager(deps: SessionManagerDeps): OpenCodeSessionM
       createdAt: new Date(),
       lastActivityAt: new Date(),
       metadata: {
+        ...extraMetadata,
         ...(reusableOpenCodeSessionId ? { opencodeSessionId: reusableOpenCodeSessionId } : {}),
       },
     };
@@ -1485,6 +1510,7 @@ export function createSessionManager(deps: SessionManagerDeps): OpenCodeSessionM
         createdAt: new Date().toISOString(),
         runtimeHandle: JSON.stringify(handle),
         opencodeSessionId: reusableOpenCodeSessionId,
+        ...extraMetadata,
       });
 
       if (plugins.agent.postLaunchSetup) {
