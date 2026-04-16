@@ -11,6 +11,7 @@ type Person = {
   name: string
   avatarUrl: string
   descriptor: string
+  isDead: true
 }
 
 type RelatedItem = {
@@ -75,22 +76,98 @@ function Avatar({
 
 const debates: DebateCard[] = [
   {
-    id: 'nietzsche-vs-peterson',
+    id: 'einstein-vs-tesla-claude-vs-codex',
+    category: 'AI',
+    title: 'Which coding copilot makes engineers sharper?',
+    hook: 'Claude Code vs Codex',
+    audience: '61.3k listening now',
+    leftPerson: {
+      name: 'Albert Einstein',
+      avatarUrl:
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Albert_Einstein_Head.jpg/330px-Albert_Einstein_Head.jpg',
+      descriptor: 'theoretical physicist',
+      isDead: true,
+    },
+    rightPerson: {
+      name: 'Nikola Tesla',
+      avatarUrl:
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/N.Tesla.JPG/330px-N.Tesla.JPG',
+      descriptor: 'visionary inventor',
+      isDead: true,
+    },
+    likes: 36400,
+    replies: 9700,
+    reposts: 3400,
+    transcript: [
+      {
+        speaker: 'Host',
+        role: 'Opening',
+        text: 'Tonight the room is asking a very current question: when engineers work with coding agents, what kind of collaborator actually makes them better rather than just faster?',
+      },
+      {
+        speaker: 'Albert Einstein',
+        role: 'Opening take',
+        text: 'A strong assistant should reduce confusion, not merely accelerate output. The real standard is whether the engineer sees the underlying structure of the problem more clearly after the exchange.',
+      },
+      {
+        speaker: 'Nikola Tesla',
+        role: 'Response',
+        text: 'Speed matters when imagination is racing ahead of implementation. The better copilot is the one that can keep up with invention and help turn an abstract system into working machinery.',
+      },
+      {
+        speaker: 'Albert Einstein',
+        role: 'Counter',
+        text: 'But if speed outruns understanding, the result is motion without mastery. A tool is only truly valuable if it leaves the human with deeper judgment.',
+      },
+      {
+        speaker: 'Nikola Tesla',
+        role: 'Close',
+        text: 'Then the best system is the one that gives clarity and momentum together: a partner that sharpens thought while helping ambitious ideas survive contact with reality.',
+      },
+    ],
+    related: [
+      {
+        id: 'cc1',
+        source: 'X',
+        headline: '“The winner is whichever copilot leaves the human thinking more clearly.”',
+        excerpt: 'A fast-moving thread arguing that coding agents should be judged by how much judgment they improve, not just how many lines they generate.',
+        meta: '31.4k likes',
+      },
+      {
+        id: 'cc2',
+        source: 'Reddit',
+        headline: 'r/programming: Claude Code vs Codex for real engineering work',
+        excerpt: 'Developers compare which assistant helps them reason through implementation instead of just autocompleting syntax.',
+        meta: '2.7k comments',
+      },
+      {
+        id: 'cc3',
+        source: 'News',
+        headline: 'Why coding copilots are being judged on reasoning, not just speed',
+        excerpt: 'A feature on how engineers are evaluating AI tools based on trust, clarity, and whether they improve the quality of thought.',
+        meta: '10 min read',
+      },
+    ],
+  },
+  {
+    id: 'nietzsche-vs-frankl',
     category: 'Meaning',
     title: 'Can modern life still give people real meaning?',
-    hook: 'Nietzsche vs Jordan Peterson',
+    hook: 'Nietzsche vs Viktor Frankl',
     audience: '28.4k listening now',
     leftPerson: {
       name: 'Friedrich Nietzsche',
       avatarUrl:
         'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Nietzsche187a.jpg/330px-Nietzsche187a.jpg',
       descriptor: 'philosopher of rupture',
+      isDead: true,
     },
     rightPerson: {
-      name: 'Jordan Peterson',
+      name: 'Viktor Frankl',
       avatarUrl:
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Jordan_Peterson_in_2018_%283x4_cropped%29.jpg/330px-Jordan_Peterson_in_2018_%283x4_cropped%29.jpg',
-      descriptor: 'psychologist of order',
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Viktor_Frankl_1985.jpg/330px-Viktor_Frankl_1985.jpg',
+      descriptor: 'searcher for meaning',
+      isDead: true,
     },
     likes: 18200,
     replies: 3900,
@@ -107,9 +184,9 @@ const debates: DebateCard[] = [
         text: 'Modern people say they want meaning, but what they often want is comfort with decoration. Meaning begins where imitation ends. A person must create values, not inherit a script and call obedience depth.',
       },
       {
-        speaker: 'Jordan Peterson',
+        speaker: 'Viktor Frankl',
         role: 'Response',
-        text: 'That sounds dramatic, but people do not stabilize themselves through endless reinvention. Meaning is found in responsibility, truth, sacrifice, and voluntarily carrying the burden of existence despite suffering.',
+        text: 'Meaning is not created only in rebellion. It is also discovered in responsibility, love, and the dignity of answering suffering without surrendering to it.',
       },
       {
         speaker: 'Friedrich Nietzsche',
@@ -117,17 +194,17 @@ const debates: DebateCard[] = [
         text: 'Responsibility can become another name for tameness. I am suspicious of any moral language that flatters weakness by calling it virtue.',
       },
       {
-        speaker: 'Jordan Peterson',
+        speaker: 'Viktor Frankl',
         role: 'Close',
-        text: 'And I am suspicious of any philosophy that celebrates transcendence without asking whether ordinary people can actually live inside it without collapse.',
+        text: 'And I am suspicious of any philosophy that offers intensity without asking whether a wounded person can still build a life inside it with courage.',
       },
     ],
     related: [
       {
         id: 'n1',
         source: 'X',
-        headline: '“Nietzsche would hate self-help culture but still understand why it exists.”',
-        excerpt: 'A viral post thread arguing that modern meaning has become branding with better lighting.',
+        headline: '“Meaning has become performance art with better branding.”',
+        excerpt: 'A viral post thread arguing that modern people often want the look of significance more than the burden of creating it.',
         meta: '14.2k likes',
       },
       {
@@ -147,22 +224,24 @@ const debates: DebateCard[] = [
     ],
   },
   {
-    id: 'jobs-vs-musk',
+    id: 'jobs-vs-tesla',
     category: 'Technology',
     title: 'Does great technology come from obsession or speed?',
-    hook: 'Steve Jobs vs Elon Musk',
+    hook: 'Steve Jobs vs Nikola Tesla',
     audience: '41.2k watching now',
     leftPerson: {
       name: 'Steve Jobs',
       avatarUrl:
         'https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Steve_Jobs_Headshot_2010-CROP_%28cropped_2%29.jpg/330px-Steve_Jobs_Headshot_2010-CROP_%28cropped_2%29.jpg',
       descriptor: 'product perfectionist',
+      isDead: true,
     },
     rightPerson: {
-      name: 'Elon Musk',
+      name: 'Nikola Tesla',
       avatarUrl:
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Elon_Musk_-_54820081119_%28cropped%29.jpg/330px-Elon_Musk_-_54820081119_%28cropped%29.jpg',
-      descriptor: 'scale-driven builder',
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/N.Tesla.JPG/330px-N.Tesla.JPG',
+      descriptor: 'visionary inventor',
+      isDead: true,
     },
     likes: 24700,
     replies: 5600,
@@ -179,9 +258,9 @@ const debates: DebateCard[] = [
         text: 'People think technology is about features. It is not. It is about taste, focus, and the discipline to remove what does not belong until the product feels inevitable.',
       },
       {
-        speaker: 'Elon Musk',
+        speaker: 'Nikola Tesla',
         role: 'Counter',
-        text: 'That is fine if the market waits for your elegance. Sometimes the point is not refinement first. Sometimes the point is to build the future before anyone else has the courage or stamina to do it.',
+        text: 'Elegance matters, but invention also demands daring before the market understands what it is seeing. The future often appears first as excess to people whose imaginations are organized by the present.',
       },
       {
         speaker: 'Steve Jobs',
@@ -189,9 +268,9 @@ const debates: DebateCard[] = [
         text: 'Moving fast does not excuse shipping mediocrity. Most complexity in technology is self-inflicted by teams that mistake velocity for clarity.',
       },
       {
-        speaker: 'Elon Musk',
+        speaker: 'Nikola Tesla',
         role: 'Close',
-        text: 'And most impossible things stay impossible because people polish the doorway instead of walking through it.',
+        text: 'And many necessary things remain unborn because practical minds keep asking invention to justify itself before it has the chance to illuminate the world.',
       },
     ],
     related: [
@@ -229,12 +308,14 @@ const debates: DebateCard[] = [
       avatarUrl:
         'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Karl_Marx_001.jpg/330px-Karl_Marx_001.jpg',
       descriptor: 'critic of capital',
+      isDead: true,
     },
     rightPerson: {
       name: 'Milton Friedman',
       avatarUrl:
         'https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Portrait_of_Milton_Friedman_%284x5_cropped%29.jpg/330px-Portrait_of_Milton_Friedman_%284x5_cropped%29.jpg',
       descriptor: 'champion of markets',
+      isDead: true,
     },
     likes: 19300,
     replies: 7200,
@@ -291,22 +372,24 @@ const debates: DebateCard[] = [
     ],
   },
   {
-    id: 'socrates-vs-altman',
+    id: 'socrates-vs-turing',
     category: 'AI',
     title: 'Will AI make humans wiser or just more capable?',
-    hook: 'Socrates vs Sam Altman',
+    hook: 'Socrates vs Alan Turing',
     audience: '52.7k queued up',
     leftPerson: {
       name: 'Socrates',
       avatarUrl:
         'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Socrates_Louvre.jpg/330px-Socrates_Louvre.jpg',
       descriptor: 'questioning mind',
+      isDead: true,
     },
     rightPerson: {
-      name: 'Sam Altman',
+      name: 'Alan Turing',
       avatarUrl:
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Sam_Altman_TechCrunch_SF_2019_Day_2_Oct_3_%28cropped_3%29.jpg/330px-Sam_Altman_TechCrunch_SF_2019_Day_2_Oct_3_%28cropped_3%29.jpg',
-      descriptor: 'builder of frontier AI',
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Alan_Turing_Aged_16.jpg/330px-Alan_Turing_Aged_16.jpg',
+      descriptor: 'founder of machine intelligence',
+      isDead: true,
     },
     likes: 31800,
     replies: 8800,
@@ -323,9 +406,9 @@ const debates: DebateCard[] = [
         text: 'A tool that extends power without examining the soul may increase action while diminishing wisdom. Knowledge is not the same thing as understanding how one ought to live.',
       },
       {
-        speaker: 'Sam Altman',
+        speaker: 'Alan Turing',
         role: 'Response',
-        text: 'That is fair, but capability matters. Better tools can expand science, health, education, and economic access. Refusing to build them does not produce wisdom either.',
+        text: 'That is fair, but capability matters. Better machines can extend science, reasoning, and discovery. Refusing to build them does not produce wisdom either; it may only leave ignorance with fewer instruments.',
       },
       {
         speaker: 'Socrates',
@@ -333,9 +416,9 @@ const debates: DebateCard[] = [
         text: 'I do not argue for refusal. I argue for proportion. The city should not admire invention so much that it forgets to question the character of the inventors and the desires of the users.',
       },
       {
-        speaker: 'Sam Altman',
+        speaker: 'Alan Turing',
         role: 'Close',
-        text: 'Then perhaps the task is not choosing between wisdom and technology, but building institutions that force them to mature together.',
+        text: 'Then perhaps the task is not choosing between wisdom and machinery, but ensuring that our powers of reflection advance with our powers of computation.',
       },
     ],
     related: [
@@ -365,7 +448,16 @@ const debates: DebateCard[] = [
 ]
 
 const initialComments: Record<string, Comment[]> = {
-  'nietzsche-vs-peterson': [
+  'einstein-vs-tesla-claude-vs-codex': [
+    {
+      id: 'c0',
+      author: 'Riya Menon',
+      handle: '@riya_codes',
+      text: 'This is exactly the right framing. The winner is whichever copilot makes me think better, not whichever one dumps the most code into the editor.',
+      likes: 412,
+    },
+  ],
+  'nietzsche-vs-frankl': [
     {
       id: 'c1',
       author: 'Maya Chen',
@@ -381,12 +473,12 @@ const initialComments: Record<string, Comment[]> = {
       likes: 96,
     },
   ],
-  'jobs-vs-musk': [
+  'jobs-vs-tesla': [
     {
       id: 'c3',
       author: 'Nina Park',
       handle: '@nina.builds',
-      text: 'Jobs is right about taste, but Musk is right about ambition. The best products probably come from teams that can do both.',
+      text: 'Jobs is right about taste, but Tesla is right about ambition. The best products probably come from teams that can do both.',
       likes: 244,
     },
   ],
@@ -399,7 +491,7 @@ const initialComments: Record<string, Comment[]> = {
       likes: 133,
     },
   ],
-  'socrates-vs-altman': [
+  'socrates-vs-turing': [
     {
       id: 'c5',
       author: 'Tara Singh',
@@ -412,23 +504,23 @@ const initialComments: Record<string, Comment[]> = {
 
 const rankings: RankingEntry[] = [
   {
-    name: 'Sam Altman',
+    name: 'Alan Turing',
     avatarUrl:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Sam_Altman_TechCrunch_SF_2019_Day_2_Oct_3_%28cropped_3%29.jpg/330px-Sam_Altman_TechCrunch_SF_2019_Day_2_Oct_3_%28cropped_3%29.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Alan_Turing_Aged_16.jpg/330px-Alan_Turing_Aged_16.jpg',
     wins: 18,
     total: 24,
   },
   {
-    name: 'Elon Musk',
+    name: 'Nikola Tesla',
     avatarUrl:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Elon_Musk_-_54820081119_%28cropped%29.jpg/330px-Elon_Musk_-_54820081119_%28cropped%29.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/N.Tesla.JPG/330px-N.Tesla.JPG',
     wins: 16,
     total: 23,
   },
   {
-    name: 'Jordan Peterson',
+    name: 'Viktor Frankl',
     avatarUrl:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Jordan_Peterson_in_2018_%283x4_cropped%29.jpg/330px-Jordan_Peterson_in_2018_%283x4_cropped%29.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Viktor_Frankl_1985.jpg/330px-Viktor_Frankl_1985.jpg',
     wins: 14,
     total: 21,
   },
@@ -469,6 +561,12 @@ const rankings: RankingEntry[] = [
   },
 ]
 
+for (const debate of debates) {
+  if (!debate.leftPerson.isDead || !debate.rightPerson.isDead) {
+    throw new Error(`Every debate must be between two deceased people. Invalid debate: ${debate.id}`)
+  }
+}
+
 function formatCount(value: number) {
   if (value >= 1000) {
     return `${(value / 1000).toFixed(1)}k`
@@ -497,7 +595,7 @@ function App() {
   )
 
   const arenaDebate = useMemo(
-    () => debates.find((debate) => debate.id === 'socrates-vs-altman') ?? debates[0],
+    () => debates.find((debate) => debate.id === 'einstein-vs-tesla-claude-vs-codex') ?? debates[0],
     [],
   )
 
