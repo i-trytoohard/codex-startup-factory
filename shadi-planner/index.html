@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shadi Planner - Budget Wedding Planner</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0a2e 100%);
+      color: #f0e6ff;
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      padding: 2rem 1rem;
+      background: linear-gradient(180deg, rgba(255,215,0,0.15) 0%, transparent 100%);
+      border-bottom: 2px solid rgba(255,215,0,0.3);
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      color: #ffd700;
+      text-shadow: 0 0 20px rgba(255,215,0,0.3);
+    }
+
+    header p {
+      margin-top: 0.5rem;
+      color: #c9b3e0;
+      font-size: 1.1rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    .budget-section {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,215,0,0.2);
+      border-radius: 16px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+
+    .budget-section h2 {
+      color: #ffd700;
+      margin-bottom: 1rem;
+      font-size: 1.4rem;
+    }
+
+    .budget-input-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .budget-input-group label {
+      font-size: 1.2rem;
+      color: #e0d0f0;
+    }
+
+    .budget-input-group input {
+      padding: 0.8rem 1.2rem;
+      font-size: 1.2rem;
+      border: 2px solid rgba(255,215,0,0.4);
+      border-radius: 10px;
+      background: rgba(0,0,0,0.3);
+      color: #ffd700;
+      width: 220px;
+      text-align: center;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .budget-input-group input:focus {
+      border-color: #ffd700;
+      box-shadow: 0 0 15px rgba(255,215,0,0.2);
+    }
+
+    .budget-input-group input::placeholder { color: rgba(255,215,0,0.4); }
+
+    .btn {
+      padding: 0.8rem 2rem;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ffd700, #ff9500);
+      color: #1a0a2e;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(255,215,0,0.4);
+    }
+
+    .budget-slider {
+      width: 100%;
+      max-width: 500px;
+      margin: 1rem auto;
+    }
+
+    .budget-slider input[type="range"] {
+      width: 100%;
+      accent-color: #ffd700;
+      height: 8px;
+      cursor: pointer;
+    }
+
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: #a090b8;
+      margin-top: 0.3rem;
+    }
+
+    .budget-display {
+      font-size: 2rem;
+      color: #ffd700;
+      font-weight: 700;
+      margin: 0.5rem 0;
+    }
+
+    .results { display: none; margin-top: 2rem; }
+
+    .results.visible { display: block; }
+
+    .summary-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .summary-item {
+      background: rgba(255,215,0,0.08);
+      border: 1px solid rgba(255,215,0,0.15);
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .summary-item .label { font-size: 0.8rem; color: #a090b8; }
+    .summary-item .value { font-size: 1.3rem; color: #ffd700; font-weight: 700; margin-top: 0.3rem; }
+
+    .category-section {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+
+    .category-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 1.5rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .category-header:hover { background: rgba(255,255,255,0.04); }
+
+    .category-header h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      font-size: 1.15rem;
+    }
+
+    .category-header .emoji { font-size: 1.5rem; }
+
+    .category-budget {
+      background: rgba(255,215,0,0.15);
+      color: #ffd700;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .category-body { padding: 0 1.5rem 1.5rem; }
+
+    .vendor-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      transition: border-color 0.3s;
+    }
+
+    .vendor-card:hover { border-color: rgba(255,215,0,0.3); }
+
+    .vendor-info h4 { color: #e8daf5; font-size: 1rem; }
+    .vendor-info p { color: #9080a8; font-size: 0.85rem; margin-top: 0.2rem; }
+
+    .vendor-price {
+      color: #4ade80;
+      font-weight: 700;
+      font-size: 1.1rem;
+      white-space: nowrap;
+    }
+
+    .vendor-tag {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      margin-right: 0.3rem;
+    }
+
+    .tag-best { background: rgba(74,222,128,0.2); color: #4ade80; }
+    .tag-premium { background: rgba(255,215,0,0.2); color: #ffd700; }
+    .tag-budget { background: rgba(96,165,250,0.2); color: #60a5fa; }
+
+    .tips-section {
+      background: rgba(74,222,128,0.06);
+      border: 1px solid rgba(74,222,128,0.2);
+      border-radius: 14px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .tips-section h3 { color: #4ade80; margin-bottom: 1rem; }
+    .tips-section ul { list-style: none; }
+
+    .tips-section li {
+      padding: 0.5rem 0;
+      padding-left: 1.5rem;
+      position: relative;
+      color: #c0d8c0;
+      font-size: 0.95rem;
+    }
+
+    .tips-section li::before {
+      content: "💡";
+      position: absolute;
+      left: 0;
+    }
+
+    .checklist {
+      background: rgba(96,165,250,0.06);
+      border: 1px solid rgba(96,165,250,0.2);
+      border-radius: 14px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .checklist h3 { color: #60a5fa; margin-bottom: 1rem; }
+
+    .checklist label {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.5rem 0;
+      cursor: pointer;
+      color: #b0c0e0;
+      font-size: 0.95rem;
+    }
+
+    .checklist input[type="checkbox"] { accent-color: #60a5fa; width: 18px; height: 18px; }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: #6050780;
+      font-size: 0.85rem;
+      color: #605078;
+    }
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.8rem; }
+      .budget-display { font-size: 1.5rem; }
+      .budget-input-group { flex-direction: column; }
+      .vendor-card { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Shadi Planner</h1>
+  <p>Apni shadi ka poora plan banayein - budget ke hisaab se</p>
+</header>
+
+<div class="container">
+  <div class="budget-section">
+    <h2>Apna Total Budget Daalein</h2>
+    <div class="budget-slider">
+      <div class="budget-display" id="budgetDisplay">&#8377;5,00,000</div>
+      <input type="range" id="budgetSlider" min="100000" max="5000000" step="50000" value="500000">
+      <div class="slider-labels">
+        <span>&#8377;1 Lakh</span>
+        <span>&#8377;25 Lakh</span>
+        <span>&#8377;50 Lakh</span>
+      </div>
+    </div>
+    <div style="margin-top: 1rem; display: flex; justify-content: center; gap: 0.5rem; align-items: center;">
+      <span style="color: #c9b3e0;">ya type karein:</span>
+      <input type="number" id="budgetInput" placeholder="e.g. 500000" min="50000" max="10000000" style="
+        padding: 0.5rem 0.8rem; font-size: 1rem; border: 1px solid rgba(255,215,0,0.3);
+        border-radius: 8px; background: rgba(0,0,0,0.3); color: #ffd700; width: 160px; outline: none;
+      ">
+    </div>
+    <br>
+    <button class="btn btn-primary" onclick="generatePlan()">Plan Banao!</button>
+  </div>
+
+  <div class="results" id="results">
+    <div class="summary-bar" id="summaryBar"></div>
+    <div id="categoriesContainer"></div>
+
+    <div class="tips-section" id="tipsSection"></div>
+
+    <div class="checklist">
+      <h3>Shadi Checklist</h3>
+      <label><input type="checkbox"> Venue / Hall finalize karna</label>
+      <label><input type="checkbox"> Catering ka menu decide karna</label>
+      <label><input type="checkbox"> Dulha-Dulhan ke kapde lena</label>
+      <label><input type="checkbox"> Photographer book karna</label>
+      <label><input type="checkbox"> DJ / Band book karna</label>
+      <label><input type="checkbox"> Mehndi artist book karna</label>
+      <label><input type="checkbox"> Card / Invitation print karna</label>
+      <label><input type="checkbox"> Gaadi ka arrangement</label>
+      <label><input type="checkbox"> Pandit ji se baat karna</label>
+      <label><input type="checkbox"> Guest list finalize karna</label>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Shadi Planner &mdash; Budget friendly shadi planning tool
+</footer>
+
+<script>
+const CATEGORIES = [
+  {
+    id: "venue",
+    name: "Venue / Hall",
+    emoji: "🏛️",
+    percent: 30,
+    getVendors(budget) {
+      const b = budget;
+      if (b < 200000) return [
+        { name: "Community Hall", desc: "Local community hall, 100-200 guests", price: b * 0.25, tags: ["budget"] },
+        { name: "Dharamshala / Gurudwara", desc: "Simple aur sasta, 150+ guests", price: b * 0.15, tags: ["budget"] },
+        { name: "Open Ground / Farm", desc: "Tent lagwa ke function, 200+ guests", price: b * 0.30, tags: ["best"] },
+      ];
+      if (b < 800000) return [
+        { name: "Banquet Hall", desc: "AC hall, 200-400 guests, basic decor included", price: b * 0.20, tags: ["best"] },
+        { name: "Marriage Garden", desc: "Open lawn + stage, 300-500 guests", price: b * 0.28, tags: [] },
+        { name: "Hotel Banquet (3-star)", desc: "AC, parking, 150-250 guests", price: b * 0.30, tags: ["premium"] },
+      ];
+      return [
+        { name: "5-Star Hotel Ballroom", desc: "Premium venue, 200-500 guests, valet parking", price: b * 0.22, tags: ["premium"] },
+        { name: "Destination - Jaipur Palace", desc: "Royal feel, 2-day package, 300 guests", price: b * 0.30, tags: ["premium"] },
+        { name: "Premium Farm House", desc: "Private lawn, pool, 400+ guests", price: b * 0.18, tags: ["best"] },
+        { name: "Resort Venue", desc: "Weekend package, stay included, 200 guests", price: b * 0.25, tags: [] },
+      ];
+    }
+  },
+  {
+    id: "catering",
+    name: "Catering / Khana",
+    emoji: "🍛",
+    percent: 25,
+    getVendors(budget) {
+      const b = budget;
+      const perPlate = b < 300000 ? [250, 400, 600] : b < 1000000 ? [500, 800, 1200] : [1000, 1500, 2500];
+      return [
+        { name: "Basic Veg Thali", desc: `${perPlate[0]}/plate - Dal, Paneer, Roti, Rice, Mithai`, price: perPlate[0], tags: ["budget"], isPerPlate: true },
+        { name: "Standard Menu", desc: `${perPlate[1]}/plate - 6 items + Starters + Dessert`, price: perPlate[1], tags: ["best"], isPerPlate: true },
+        { name: "Premium Buffet", desc: `${perPlate[2]}/plate - 12+ items, Live counters, Chaat`, price: perPlate[2], tags: ["premium"], isPerPlate: true },
+      ];
+    }
+  },
+  {
+    id: "clothing",
+    name: "Kapde / Clothing",
+    emoji: "👗",
+    percent: 15,
+    getVendors(budget) {
+      const b = budget;
+      if (b < 300000) return [
+        { name: "Dulhan Lehenga (Budget)", desc: "Chandni Chowk / local market, embroidery work", price: 15000, tags: ["budget"] },
+        { name: "Dulha Sherwani (Budget)", desc: "Rental ya local tailor se", price: 8000, tags: ["budget"] },
+        { name: "Family Kapde", desc: "Sarees, suits for close family", price: 20000, tags: [] },
+      ];
+      if (b < 1000000) return [
+        { name: "Designer Lehenga", desc: "Branded showroom, heavy work", price: 50000, tags: ["best"] },
+        { name: "Dulha Sherwani", desc: "Manyavar / Raymond type", price: 25000, tags: ["best"] },
+        { name: "Mehndi + Sangeet Outfits", desc: "Separate looks for each function", price: 20000, tags: [] },
+        { name: "Family Outfits", desc: "Coordinated family look", price: 40000, tags: [] },
+      ];
+      return [
+        { name: "Designer Bridal Lehenga", desc: "Sabyasachi / Manish Malhotra level", price: 200000, tags: ["premium"] },
+        { name: "Custom Sherwani", desc: "Bespoke tailored, premium fabric", price: 80000, tags: ["premium"] },
+        { name: "All Function Outfits", desc: "Mehndi, Sangeet, Haldi, Reception - all covered", price: 100000, tags: ["best"] },
+        { name: "Family + Bridesmaids", desc: "Matching theme outfits", price: 80000, tags: [] },
+      ];
+    }
+  },
+  {
+    id: "decor",
+    name: "Decoration / Sajawat",
+    emoji: "🌸",
+    percent: 10,
+    getVendors(budget) {
+      const b = budget;
+      if (b < 300000) return [
+        { name: "Basic Flower + Light Decor", desc: "Marigold, lights, basic stage", price: 15000, tags: ["budget"] },
+        { name: "DIY Decoration", desc: "Fairy lights + paper flowers + drapes", price: 5000, tags: ["budget", "best"] },
+      ];
+      if (b < 1000000) return [
+        { name: "Themed Stage Decor", desc: "Flowers, drapes, LED, photo backdrop", price: 40000, tags: ["best"] },
+        { name: "Full Venue Decoration", desc: "Entry gate, mandap, dining area decor", price: 60000, tags: [] },
+        { name: "Flower + LED Package", desc: "Rose petals, fairy lights, candles", price: 30000, tags: ["budget"] },
+      ];
+      return [
+        { name: "Luxury Floral Decor", desc: "Imported flowers, grand mandap, chandelier", price: 200000, tags: ["premium"] },
+        { name: "Themed Wedding Decor", desc: "Royal / Rustic / Pastel - full venue transform", price: 150000, tags: ["best"] },
+        { name: "Entry + Mandap + Reception", desc: "Different themes for each event", price: 120000, tags: [] },
+      ];
+    }
+  },
+  {
+    id: "photo",
+    name: "Photography / Video",
+    emoji: "📸",
+    percent: 8,
+    getVendors(budget) {
+      const b = budget;
+      if (b < 300000) return [
+        { name: "Local Photographer", desc: "1 camera, full day, album included", price: 15000, tags: ["budget"] },
+        { name: "Photo + Video Combo", desc: "1 photographer + 1 videographer", price: 25000, tags: ["best"] },
+      ];
+      if (b < 1000000) return [
+        { name: "Professional Studio", desc: "2 cameras, drone shot, highlight reel", price: 50000, tags: ["best"] },
+        { name: "Pre-Wedding Shoot", desc: "Outdoor location shoot, 50 edited photos", price: 20000, tags: [] },
+        { name: "Candid + Traditional", desc: "2 photographers, cinematic video, album", price: 70000, tags: ["premium"] },
+      ];
+      return [
+        { name: "Premium Cinematic Team", desc: "3+ cameras, drone, same-day edit, teaser", price: 150000, tags: ["premium"] },
+        { name: "Destination Pre-Wedding", desc: "Travel shoot, 100+ photos, video", price: 80000, tags: [] },
+        { name: "Full Coverage Package", desc: "All events, candid + posed, luxury album", price: 200000, tags: ["best"] },
+      ];
+    }
+  },
+  {
+    id: "music",
+    name: "Music / DJ / Band",
+    emoji: "🎵",
+    percent: 5,
+    getVendors(budget) {
+      const b = budget;
+      if (b < 300000) return [
+        { name: "DJ Sound System", desc: "Basic DJ setup, 4 speakers, lights", price: 8000, tags: ["budget"] },
+        { name: "Dhol Wala", desc: "Traditional dhol for baraat", price: 5000, tags: ["best"] },
+      ];
+      if (b < 1000000) return [
+        { name: "Professional DJ", desc: "DJ + LED dance floor + fog machine", price: 25000, tags: ["best"] },
+        { name: "Band Baaja", desc: "Brass band for baraat, 10-15 members", price: 15000, tags: [] },
+        { name: "Sangeet Choreographer", desc: "Dance prep for sangeet, 5 sessions", price: 10000, tags: [] },
+      ];
+      return [
+        { name: "Celebrity DJ", desc: "Known DJ, premium sound, full night", price: 100000, tags: ["premium"] },
+        { name: "Live Band + Singers", desc: "6-piece band, Bollywood + Sufi set", price: 80000, tags: ["best"] },
+        { name: "Complete Sangeet Production", desc: "Choreography, sound, lights, anchor", price: 60000, tags: [] },
+      ];
+    }
+  },
+  {
+    id: "mehndi",
+    name: "Mehndi / Beauty",
+    emoji: "💅",
+    percent: 4,
+    getVendors(budget) {
+      const b = budget;
+      if (b < 300000) return [
+        { name: "Local Mehndi Artist", desc: "Bridal mehndi, both hands + feet", price: 3000, tags: ["budget"] },
+        { name: "Parlour Bridal Package", desc: "Makeup + hair + draping", price: 8000, tags: ["best"] },
+      ];
+      if (b < 1000000) return [
+        { name: "Professional Mehndi Artist", desc: "Detailed bridal + guest mehndi", price: 10000, tags: ["best"] },
+        { name: "Bridal Makeup Artist", desc: "HD makeup, hair styling, 2 looks", price: 25000, tags: [] },
+        { name: "Grooming Package (Dulha)", desc: "Facial, hair, beard styling", price: 5000, tags: [] },
+      ];
+      return [
+        { name: "Celebrity Makeup Artist", desc: "Airbrush makeup, all events, trial included", price: 80000, tags: ["premium"] },
+        { name: "Premium Mehndi", desc: "Rajasthani artist, intricate design, 20+ guests", price: 25000, tags: ["best"] },
+        { name: "Full Beauty Package", desc: "Bride + Groom + Family, all events", price: 50000, tags: [] },
+      ];
+    }
+  },
+  {
+    id: "invite",
+    name: "Cards / Invitation",
+    emoji: "💌",
+    percent: 3,
+    getVendors(budget) {
+      const b = budget;
+      if (b < 300000) return [
+        { name: "WhatsApp E-Invite", desc: "Digital card, video invite", price: 1500, tags: ["budget", "best"] },
+        { name: "Simple Printed Cards", desc: "200 cards, basic design", price: 5000, tags: [] },
+      ];
+      if (b < 1000000) return [
+        { name: "Designer E-Invite", desc: "Animated video + website RSVP", price: 5000, tags: ["best"] },
+        { name: "Premium Printed Cards", desc: "300 cards, box invite, sweet", price: 20000, tags: [] },
+        { name: "Combo Pack", desc: "E-invite + 200 printed cards", price: 12000, tags: ["budget"] },
+      ];
+      return [
+        { name: "Luxury Box Invitation", desc: "Custom box, mithai, dry fruits, 200 pcs", price: 60000, tags: ["premium"] },
+        { name: "Wedding Website", desc: "Custom domain, RSVP, photos, schedule", price: 15000, tags: ["best"] },
+        { name: "Scroll Invitations", desc: "Royal scroll style, 300 pieces", price: 40000, tags: [] },
+      ];
+    }
+  }
+];
+
+function formatINR(num) {
+  if (num >= 10000000) return "₹" + (num / 10000000).toFixed(1) + " Cr";
+  if (num >= 100000) return "₹" + (num / 100000).toFixed(1) + " L";
+  if (num >= 1000) return "₹" + (num / 1000).toFixed(1) + "K";
+  return "₹" + num.toLocaleString("en-IN");
+}
+
+function formatFull(num) {
+  return "₹" + Math.round(num).toLocaleString("en-IN");
+}
+
+const slider = document.getElementById("budgetSlider");
+const display = document.getElementById("budgetDisplay");
+const input = document.getElementById("budgetInput");
+
+slider.addEventListener("input", () => {
+  display.textContent = formatFull(parseInt(slider.value));
+  input.value = "";
+});
+
+input.addEventListener("input", () => {
+  const v = parseInt(input.value);
+  if (v && v >= 50000) {
+    slider.value = Math.min(v, 5000000);
+    display.textContent = formatFull(v);
+  }
+});
+
+function generatePlan() {
+  const budget = parseInt(input.value) || parseInt(slider.value);
+  if (!budget || budget < 50000) {
+    alert("Kam se kam ₹50,000 ka budget daalein!");
+    return;
+  }
+
+  const resultsDiv = document.getElementById("results");
+  resultsDiv.classList.add("visible");
+
+  const summaryBar = document.getElementById("summaryBar");
+  summaryBar.innerHTML = `
+    <div class="summary-item">
+      <div class="label">Total Budget</div>
+      <div class="value">${formatINR(budget)}</div>
+    </div>
+    <div class="summary-item">
+      <div class="label">Venue (30%)</div>
+      <div class="value">${formatINR(budget * 0.30)}</div>
+    </div>
+    <div class="summary-item">
+      <div class="label">Catering (25%)</div>
+      <div class="value">${formatINR(budget * 0.25)}</div>
+    </div>
+    <div class="summary-item">
+      <div class="label">Other (45%)</div>
+      <div class="value">${formatINR(budget * 0.45)}</div>
+    </div>
+  `;
+
+  const container = document.getElementById("categoriesContainer");
+  container.innerHTML = "";
+
+  CATEGORIES.forEach(cat => {
+    const catBudget = budget * (cat.percent / 100);
+    const vendors = cat.getVendors(budget);
+
+    const section = document.createElement("div");
+    section.className = "category-section";
+
+    const vendorCards = vendors.map(v => {
+      const tags = v.tags.map(t =>
+        `<span class="vendor-tag tag-${t}">${t === "best" ? "Best Value" : t === "premium" ? "Premium" : "Budget"}</span>`
+      ).join("");
+
+      const priceText = v.isPerPlate ? formatFull(v.price) + "/plate" : formatFull(v.price);
+
+      return `
+        <div class="vendor-card">
+          <div class="vendor-info">
+            <h4>${tags} ${v.name}</h4>
+            <p>${v.desc}</p>
+          </div>
+          <div class="vendor-price">${priceText}</div>
+        </div>
+      `;
+    }).join("");
+
+    section.innerHTML = `
+      <div class="category-header" onclick="this.parentElement.querySelector('.category-body').classList.toggle('collapsed')">
+        <h3><span class="emoji">${cat.emoji}</span> ${cat.name}</h3>
+        <span class="category-budget">${formatINR(catBudget)}</span>
+      </div>
+      <div class="category-body">
+        ${vendorCards}
+      </div>
+    `;
+
+    container.appendChild(section);
+  });
+
+  const tips = document.getElementById("tipsSection");
+  let tipsHTML = "<h3>Budget Tips</h3><ul>";
+  if (budget < 300000) {
+    tipsHTML += `
+      <li>Off-season (July-Sept) mein venue 30-40% sasta milta hai</li>
+      <li>Weekday shadi karo - hall ka rate kam hota hai</li>
+      <li>E-invites bhejo - cards ka paisa bachao</li>
+      <li>Local photographers ko prefer karo - achha kaam, kam price</li>
+      <li>Family aur dost ko involve karo decoration mein</li>
+      <li>Rental lehenga/sherwani bhi achha option hai</li>
+    `;
+  } else if (budget < 1000000) {
+    tipsHTML += `
+      <li>Venue aur catering combo deal mein lo - discount milega</li>
+      <li>Pre-wedding shoot weekday pe karo - photographer sasta milega</li>
+      <li>DJ + Dhol combo book karo for baraat</li>
+      <li>Mehndi function ghar pe karo - venue cost bachao</li>
+      <li>Bulk mein kapde kharido - family discount milega</li>
+    `;
+  } else {
+    tipsHTML += `
+      <li>Wedding planner hire karo - time aur stress bachega</li>
+      <li>Early booking pe 10-15% discount milta hai</li>
+      <li>Destination wedding mein guest count kam rakho - quality badhao</li>
+      <li>Pre-wedding shoot ka video social media pe daal sakte ho</li>
+      <li>Insurance le lo - bade events ke liye zaroori hai</li>
+    `;
+  }
+  tipsHTML += "</ul>";
+  tips.innerHTML = tipsHTML;
+
+  resultsDiv.scrollIntoView({ behavior: "smooth" });
+}
+</script>
+
+</body>
+</html>
