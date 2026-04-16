@@ -70,7 +70,7 @@ shadi-planner/config.local.js
 .DS_Store
 Thumbs.db
 .gstack/
-
 # Local validator smoke-test outputs
 artifacts/validator-runs/
 artifacts/validator-smoke-report.md
+shadi-planner/env.js

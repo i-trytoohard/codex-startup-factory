@@ -1,0 +1,18 @@
+:root {
+  --bg-primary: #0f0a1a;
+  --bg-secondary: #1a1028;
+  --bg-card: rgba(255,255,255,0.04);
+  --bg-card-hover: rgba(255,255,255,0.07);
+  --gold: #ffd700;
+  --gold-dim: rgba(255,215,0,0.15);
+  --green: #4ade80;
+  --blue: #60a5fa;
+  --red: #f87171;
+  --purple: #c084fc;
+  --text-primary: #f0e6ff;
+  --text-secondary: #a090b8;
+  --text-muted: #605078;
+  --border: rgba(255,255,255,0.08);
+  --border-gold: rgba(255,215,0,0.25);
+  --radius: 14px;
+}
