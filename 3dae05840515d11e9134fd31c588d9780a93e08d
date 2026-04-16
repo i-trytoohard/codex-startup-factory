@@ -1,0 +1,41 @@
+tsconfig.node.json
+  af3088125a5cd4f6 1-24
+tsconfig.json
+  af3088125a5cd4f6 1-7
+package.json
+  af3088125a5cd4f6 1-30
+vite.config.ts
+  af3088125a5cd4f6 1-171
+tsconfig.app.json
+  af3088125a5cd4f6 1-25
+.env.example
+  af3088125a5cd4f6 1
+README.md
+  af3088125a5cd4f6 1-73
+eslint.config.js
+  af3088125a5cd4f6 1-23
+index.html
+  af3088125a5cd4f6 1-13
+.gitignore
+  af3088125a5cd4f6 1-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.0",
+  "base_commit_sha": "3dae05840515d11e9134fd31c588d9780a93e08d",
+  "prompts": {
+    "af3088125a5cd4f6": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d95e7-a5fe-7c23-85b4-526e49b00088",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Ashish Huddar",
+      "messages": [],
+      "total_additions": 391,
+      "total_deletions": 0,
+      "accepted_lines": 391,
+      "overriden_lines": 0
+    }
+  }
+}
