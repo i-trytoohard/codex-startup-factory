@@ -11,8 +11,11 @@ import {
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join, resolve } from "node:path";
+import { bundle } from "@remotion/bundler";
+import { ensureBrowser, renderMedia, selectComposition } from "@remotion/renderer";
 import { exec } from "../shell.js";
 import { createBlueprintSceneDefaults, launchFamilySpecV1 } from "./spec.js";
+import type { LaunchVideoRenderInput } from "./render-types.js";
 import type {
   AnalysisScene,
   ArtifactPaths,
@@ -108,7 +111,8 @@ export interface JudgeResult {
 
 export interface BuildResult {
   artifactPaths: ArtifactPaths;
-  renderPlanPath: string;
+  renderOutputPath: string;
+  buildMetadataPath: string;
   cached: boolean;
 }
 
@@ -378,6 +382,39 @@ function buildScenePlan(durationSeconds: number | null): Array<{
 
 function sceneMidpoints(scenes: ReturnType<typeof buildScenePlan>): number[] {
   return scenes.map((scene) => Number(((scene.startSeconds + scene.endSeconds) / 2).toFixed(2)));
+}
+
+function perSecondTimes(durationSeconds: number | null): number[] {
+  const safeDuration = durationSeconds && durationSeconds > 0 ? durationSeconds : 60;
+  const times: number[] = [];
+  for (let t = 0; t < safeDuration; t += 1) {
+    times.push(Number(t.toFixed(2)));
+  }
+  return times;
+}
+
+function findNearestKeyframe(
+  keyframes: KeyframeRecord[],
+  targetTime: number,
+): KeyframeRecord | undefined {
+  let best: KeyframeRecord | undefined;
+  let bestDelta = Infinity;
+  for (const kf of keyframes) {
+    const delta = Math.abs(kf.timeSeconds - targetTime);
+    if (delta < bestDelta) {
+      bestDelta = delta;
+      best = kf;
+    }
+  }
+  return best;
+}
+
+function findKeyframesInRange(
+  keyframes: KeyframeRecord[],
+  startSeconds: number,
+  endSeconds: number,
+): KeyframeRecord[] {
+  return keyframes.filter((kf) => kf.timeSeconds >= startSeconds && kf.timeSeconds < endSeconds);
 }
 
 async function extractKeyframes(
@@ -1032,6 +1069,188 @@ function buildRenderPlan(blueprint: LaunchVideoBlueprintV1): string {
   ].join("\n");
 }
 
+function renderRootPath(): string {
+  return resolve(
+    decodeURIComponent(new URL("./render-root.tsx", import.meta.url).pathname),
+  );
+}
+
+function renderCommandString(artifactRoot: string): string {
+  return (
+    process.env["AO_LAUNCH_VIDEO_RENDER_COMMAND"] ??
+    `pnpm --filter @aoagents/ao-cli dev -- launch-video build --artifact-dir ${artifactRoot} --project-name "Launch Video MVP" --force`
+  );
+}
+
+function encodeFileAsDataUrl(path: string | null): string | null {
+  if (!path || !existsSync(path)) return null;
+  const buffer = readFileSync(path);
+  const extension = path.endsWith(".png") ? "png" : "jpeg";
+  return `data:image/${extension};base64,${buffer.toString("base64")}`;
+}
+
+function buildRenderInput(blueprint: LaunchVideoBlueprintV1): LaunchVideoRenderInput {
+  const fps = 30;
+  const width = blueprint.reference.dimensions.width ?? 640;
+  const height = blueprint.reference.dimensions.height ?? 360;
+  const durationInFrames = Math.max(
+    1,
+    Math.round((blueprint.performance.targetDurationSeconds ?? 10) * fps),
+  );
+
+  const scenes = blueprint.scenes.map((scene) => {
+    const placeholderAssetsUsed = scene.assetsNeeded.filter(
+      (asset) => !scene.assetsUsed.includes(asset),
+    );
+    return {
+      ...scene,
+      keyframeDataUrl: encodeFileAsDataUrl(scene.sourceKeyframePath),
+      placeholderAssetsUsed,
+    };
+  });
+
+  return {
+    blueprint,
+    scenes,
+    fps,
+    width,
+    height,
+    durationInFrames,
+    placeholderAssetsUsed: unique(scenes.flatMap((scene) => scene.placeholderAssetsUsed)),
+  };
+}
+
+async function inspectVideoWithFfprobe(path: string): Promise<{
+  durationSeconds: number;
+  fps: number;
+  width: number;
+  height: number;
+}> {
+  const { stdout } = await exec("ffprobe", [
+    "-v",
+    "error",
+    "-show_streams",
+    "-show_format",
+    "-of",
+    "json",
+    path,
+  ]);
+  const parsed = JSON.parse(stdout) as {
+    streams?: Array<{
+      codec_type?: string;
+      width?: number;
+      height?: number;
+      avg_frame_rate?: string;
+      duration?: string;
+    }>;
+    format?: { duration?: string };
+  };
+  const videoStream = parsed.streams?.find((stream) => stream.codec_type === "video");
+  const frameRateText = videoStream?.avg_frame_rate ?? "30/1";
+  const [num, den] = frameRateText.split("/").map(Number);
+  const fps = den && num ? num / den : 30;
+  return {
+    durationSeconds: Number(parsed.format?.duration ?? videoStream?.duration ?? 0),
+    fps,
+    width: videoStream?.width ?? 640,
+    height: videoStream?.height ?? 360,
+  };
+}
+
+async function analyzeRenderedPreview(
+  renderPath: string,
+  toolchain: ToolchainAvailability,
+): Promise<{ frameAnalyses: FrameAnalysis[]; frameDiffs: FrameDiff[] }> {
+  if (!toolchain.swiftAvailable) {
+    return { frameAnalyses: [], frameDiffs: [] };
+  }
+
+  const previewInfo = await inspectVideoWithFfprobe(renderPath);
+  const tempDir = mkdtempSync(join(tmpdir(), "ao-launch-video-render-judge-"));
+  const keyframes = await extractKeyframes(
+    renderPath,
+    tempDir,
+    perSecondTimes(previewInfo.durationSeconds),
+    toolchain,
+  );
+  const frameAnalyses = await analyzeKeyframes(keyframes, toolchain);
+  const frameDiffs = await diffKeyframes(keyframes, toolchain);
+  rmSync(tempDir, { recursive: true, force: true });
+  return { frameAnalyses, frameDiffs };
+}
+
+function buildRenderedJudge(
+  artifactRoot: string,
+  blueprint: LaunchVideoBlueprintV1,
+  renderMetadata: { durationSeconds: number; fps: number; width: number; height: number },
+  frameAnalyses: FrameAnalysis[],
+  frameDiffs: FrameDiff[],
+): JudgeOutput {
+  const targetDuration = blueprint.performance.targetDurationSeconds ?? renderMetadata.durationSeconds;
+  const durationDelta = Math.abs(renderMetadata.durationSeconds - targetDuration);
+  const paletteSet = new Set(blueprint.style.palette.map((color) => color.toLowerCase()));
+  const paletteOverlap = frameAnalyses
+    .flatMap((frame) => frame.palette)
+    .filter((color) => paletteSet.has(color.toLowerCase())).length;
+  const ocrDensity = frameAnalyses.reduce((sum, frame) => sum + frame.textLines.length, 0);
+  const avgDiff =
+    frameDiffs.reduce((sum, diff) => sum + diff.differenceScore, 0) / Math.max(1, frameDiffs.length);
+
+  const scores = {
+    structure: clampScore(8 + (blueprint.scenes.length >= 5 ? 1 : 0)),
+    timing: clampScore(9 - durationDelta * 2),
+    typography: clampScore(6 + Math.min(3, ocrDensity > 0 ? 2 : 0) + (ocrDensity > 4 ? 1 : 0)),
+    palette: clampScore(6 + Math.min(3, paletteOverlap)),
+    motion: clampScore(6 + (avgDiff > 0.08 ? 1 : 0) + (avgDiff > 0.16 ? 1 : 0)),
+    emotional_tone: clampScore(6 + (frameAnalyses[0]?.contrast ?? 0) * 4 + (ocrDensity > 0 ? 1 : 0)),
+  } satisfies JudgeOutput["scores"];
+  const approved = Object.values(scores).every((score) => score >= 7);
+
+  return {
+    version: "judge-v2",
+    generatedAt: new Date().toISOString(),
+    artifactRoot,
+    summary: approved
+      ? "The rendered preview is structurally coherent and watchable as a first blueprint-driven candidate."
+      : "The rendered preview exists and is inspectable, but it still reads as a placeholder-heavy first pass.",
+    scores,
+    top_fixes: [
+      "Replace placeholder asset panels with real staged product and brand media.",
+      "Improve typography fidelity by replacing OCR-derived text with approved launch copy.",
+      "Add a final audio layer or VO so the motion beats land with more intent.",
+    ],
+    revision_notes: [
+      `Rendered output measures ${renderMetadata.width}x${renderMetadata.height} at ${renderMetadata.fps.toFixed(2)} fps.`,
+      "Keep the launch-family scene order intact while swapping in real assets.",
+      "Use the rendered preview as the basis for blueprint-v2 timing adjustments rather than re-guessing from reference only.",
+    ],
+    approved,
+  };
+}
+
+function buildAssetsMarkdown(
+  blueprint: LaunchVideoBlueprintV1,
+  placeholderAssetsUsed: string[],
+): string {
+  return [
+    "# Assets Status",
+    "",
+    "## Real Inputs",
+    "",
+    `- Reference video: \`${blueprint.reference.originalPath}\``,
+    "- Extracted reference keyframes from `analysis/keyframes/*.jpg`",
+    "- OCR-detected text from the reference frames",
+    "",
+    "## Placeholder Inputs",
+    "",
+    ...placeholderAssetsUsed.map((asset) => `- ${asset}`),
+    "",
+    "## Next Asset Drops",
+    "",
+    ...blueprint.assets.needed.slice(0, 12).map((asset) => `- ${asset}`),
+  ].join("\n");
+}
+
 function completeAnalysisExists(paths: ArtifactPaths): boolean {
   const requiredFiles = [
     join(paths.referenceDir, "reference.json"),
@@ -1072,15 +1291,34 @@ export async function analyzeReferenceVideo(options: AnalyzeOptions): Promise<An
   const toolchain = await detectToolchain();
   const inspectResult = await inspectReference(absoluteInputPath, toolchain);
   const plannedScenes = buildScenePlan(inspectResult.durationSeconds);
-  const keyframeTimes = sceneMidpoints(plannedScenes);
+
+  // Extract one keyframe per second for dense coverage
+  const allKeyframeTimes = perSecondTimes(inspectResult.durationSeconds);
   const keyframes = await extractKeyframes(
     absoluteInputPath,
     artifactPaths.keyframesDir,
-    keyframeTimes,
+    allKeyframeTimes,
     toolchain,
   );
   const frameAnalyses = await analyzeKeyframes(keyframes, toolchain);
   const frameDiffs = await diffKeyframes(keyframes, toolchain);
+
+  // Map the nearest keyframe to each scene midpoint for per-scene analysis
+  const sceneMids = sceneMidpoints(plannedScenes);
+  const sceneKeyframes = sceneMids.map((mid) => findNearestKeyframe(keyframes, mid));
+  const sceneFrameAnalyses = sceneKeyframes.map((kf) =>
+    kf ? frameAnalyses[keyframes.indexOf(kf)] : undefined,
+  );
+  const sceneFrameDiffs = sceneMids.map((_mid, index) => {
+    const kf = sceneKeyframes[index];
+    const nextKf = sceneKeyframes[index + 1];
+    if (!kf || !nextKf) return undefined;
+    const kfIdx = keyframes.indexOf(kf);
+    const nextKfIdx = keyframes.indexOf(nextKf);
+    return frameDiffs.find(
+      (d) => d.fromPath === keyframes[kfIdx]?.path && d.toPath === keyframes[nextKfIdx]?.path,
+    );
+  });
 
   const metadata: ReferenceMetadata = {
     originalPath: absoluteInputPath,
@@ -1115,9 +1353,14 @@ export async function analyzeReferenceVideo(options: AnalyzeOptions): Promise<An
     },
   };
 
-  const scenes = buildScenes(plannedScenes, keyframes, frameAnalyses, frameDiffs);
+  // Build scenes using per-scene mapped keyframes
+  const filteredSceneKeyframes = sceneKeyframes.filter((kf): kf is KeyframeRecord => kf !== undefined);
+  const filteredSceneFrameAnalyses = sceneFrameAnalyses.filter((fa): fa is FrameAnalysis => fa !== undefined);
+  const filteredSceneFrameDiffs = sceneFrameDiffs.filter((fd): fd is FrameDiff => fd !== undefined);
+  const scenes = buildScenes(plannedScenes, filteredSceneKeyframes, filteredSceneFrameAnalyses, filteredSceneFrameDiffs);
   const transcript = buildTranscript(scenes, toolchain);
   const audioEvents = buildAudioEvents(scenes, metadata);
+  // Use ALL keyframe data for richer style and motion analysis
   const style = buildStyleAnalysis(metadata, frameAnalyses, scenes);
   const motion = buildMotionAnalysis(scenes, frameDiffs);
   const editorial = buildEditorialAnalysis(scenes, transcript);
@@ -1240,7 +1483,10 @@ export async function runJudge(options: CommonCommandOptions): Promise<JudgeResu
   ensureArtifactTree(artifactPaths);
   ensureAnalyzed(artifactPaths);
 
-  const judgePath = join(artifactPaths.judgeDir, "judge-v1.json");
+  const renderPath = join(artifactPaths.rendersDir, "preview-v1.mp4");
+  const judgePath = existsSync(renderPath)
+    ? join(artifactPaths.judgeDir, "judge-v2.json")
+    : join(artifactPaths.judgeDir, "judge-v1.json");
   if (!options.force && existsSync(judgePath)) {
     return { artifactPaths, judge: readJsonFile<JudgeOutput>(judgePath), cached: true };
   }
@@ -1254,7 +1500,21 @@ export async function runJudge(options: CommonCommandOptions): Promise<JudgeResu
           force: options.force,
         })
       ).blueprint;
-  const judge = buildJudge(artifactPaths.rootDir, blueprint);
+  let judge: JudgeOutput;
+  if (existsSync(renderPath)) {
+    const toolchain = await detectToolchain();
+    const renderMetadata = await inspectVideoWithFfprobe(renderPath);
+    const renderAnalysis = await analyzeRenderedPreview(renderPath, toolchain);
+    judge = buildRenderedJudge(
+      artifactPaths.rootDir,
+      blueprint,
+      renderMetadata,
+      renderAnalysis.frameAnalyses,
+      renderAnalysis.frameDiffs,
+    );
+  } else {
+    judge = buildJudge(artifactPaths.rootDir, blueprint);
+  }
   writeJsonFile(judgePath, judge);
   return { artifactPaths, judge, cached: false };
 }
@@ -1265,8 +1525,10 @@ export async function createBuildPlan(options: CommonCommandOptions): Promise<Bu
   ensureAnalyzed(artifactPaths);
 
   const renderPlanPath = join(artifactPaths.rendersDir, "preview-v1.md");
-  if (!options.force && existsSync(renderPlanPath)) {
-    return { artifactPaths, renderPlanPath, cached: true };
+  const renderOutputPath = join(artifactPaths.rendersDir, "preview-v1.mp4");
+  const buildMetadataPath = join(artifactPaths.rendersDir, "preview-v1-build.json");
+  if (!options.force && existsSync(renderOutputPath) && existsSync(buildMetadataPath)) {
+    return { artifactPaths, renderOutputPath, buildMetadataPath, cached: true };
   }
 
   const blueprint = existsSync(join(artifactPaths.blueprintsDir, "blueprint-v1.json"))
@@ -1279,8 +1541,60 @@ export async function createBuildPlan(options: CommonCommandOptions): Promise<Bu
         })
       ).blueprint;
 
+  const renderInput = buildRenderInput(blueprint);
+  const browserStatus = await ensureBrowser({ logLevel: "error" });
+  if (!("path" in browserStatus)) {
+    throw new Error("Remotion could not resolve a Chromium browser executable.");
+  }
+  const browserExecutable = browserStatus.path;
+  const bundledServeUrl = await bundle({
+    entryPoint: renderRootPath(),
+    onProgress: () => undefined,
+  });
+  const composition = await selectComposition({
+    id: "LaunchVideoPreview",
+    serveUrl: bundledServeUrl,
+    inputProps: renderInput,
+    browserExecutable,
+    logLevel: "error",
+  });
+
+  await renderMedia({
+    composition,
+    serveUrl: bundledServeUrl,
+    codec: "h264",
+    outputLocation: renderOutputPath,
+    inputProps: renderInput,
+    overwrite: true,
+    browserExecutable,
+    muted: true,
+    logLevel: "error",
+  });
+
   writeTextFile(renderPlanPath, buildRenderPlan(blueprint));
-  return { artifactPaths, renderPlanPath, cached: false };
+  writeTextFile(
+    join(artifactPaths.referenceDir, "assets.md"),
+    buildAssetsMarkdown(blueprint, renderInput.placeholderAssetsUsed),
+  );
+  writeJsonFile(buildMetadataPath, {
+    blueprintPath: join(artifactPaths.blueprintsDir, "blueprint-v1.json"),
+    renderCommandUsed: renderCommandString(artifactPaths.rootDir),
+    compositionName: composition.id,
+    fps: composition.fps,
+    dimensions: {
+      width: composition.width,
+      height: composition.height,
+    },
+    durationInFrames: composition.durationInFrames,
+    durationSeconds: composition.durationInFrames / composition.fps,
+    placeholderAssetsUsed: renderInput.placeholderAssetsUsed,
+    knownFidelityGaps: [
+      "Rendered output still uses placeholder asset cards where product/brand media are missing.",
+      "No final VO or music bed is mixed into preview-v1.mp4 yet.",
+      "Typography is driven by system fonts and OCR-derived text, not final brand type.",
+    ],
+  });
+  return { artifactPaths, renderOutputPath, buildMetadataPath, cached: false };
 }
 
 export async function createRevisionPlan(options: CommonCommandOptions): Promise<ReviseResult> {
@@ -1288,15 +1602,25 @@ export async function createRevisionPlan(options: CommonCommandOptions): Promise
   ensureArtifactTree(artifactPaths);
   ensureAnalyzed(artifactPaths);
 
-  const revisionPlanPath = join(artifactPaths.judgeDir, "revision-v1.json");
+  const renderPath = join(artifactPaths.rendersDir, "preview-v1.mp4");
+  const revisionPlanPath = existsSync(renderPath)
+    ? join(artifactPaths.judgeDir, "revision-v2.json")
+    : join(artifactPaths.judgeDir, "revision-v1.json");
   if (!options.force && existsSync(revisionPlanPath)) {
     return { artifactPaths, revisionPlanPath, cached: true };
   }
 
-  const judge = existsSync(join(artifactPaths.judgeDir, "judge-v1.json"))
-    ? readJsonFile<JudgeOutput>(join(artifactPaths.judgeDir, "judge-v1.json"))
-    : (await runJudge({ artifactDir: artifactPaths.rootDir, projectName: options.projectName }))
-        .judge;
+  const judgePath = existsSync(renderPath)
+    ? join(artifactPaths.judgeDir, "judge-v2.json")
+    : join(artifactPaths.judgeDir, "judge-v1.json");
+  const judge =
+    !options.force && existsSync(judgePath)
+      ? readJsonFile<JudgeOutput>(judgePath)
+      : (await runJudge({
+          artifactDir: artifactPaths.rootDir,
+          projectName: options.projectName,
+          force: options.force,
+        })).judge;
   const blueprint = existsSync(join(artifactPaths.blueprintsDir, "blueprint-v1.json"))
     ? readJsonFile<LaunchVideoBlueprintV1>(join(artifactPaths.blueprintsDir, "blueprint-v1.json"))
     : (
@@ -1308,11 +1632,12 @@ export async function createRevisionPlan(options: CommonCommandOptions): Promise
       ).blueprint;
 
   writeJsonFile(revisionPlanPath, {
-    version: "revision-v1",
+    version: existsSync(renderPath) ? "revision-v2" : "revision-v1",
     generatedAt: new Date().toISOString(),
-    sourceJudgePath: join(artifactPaths.judgeDir, "judge-v1.json"),
+    sourceJudgePath: judgePath,
     approved: judge.approved,
     nextBlueprintTarget: "blueprints/blueprint-v2.json",
+    renderPath: existsSync(renderPath) ? renderPath : null,
     keep: blueprint.scenes.map((scene) => ({
       sceneId: scene.id,
       role: scene.role,
@@ -1324,9 +1649,13 @@ export async function createRevisionPlan(options: CommonCommandOptions): Promise
     top_fixes: judge.top_fixes,
     revision_notes: judge.revision_notes,
     concrete_next_steps: [
-      "Replace inferred asset slots with real Desktop-staged assets.",
+      existsSync(renderPath)
+        ? "Replace placeholder cards in preview-v1.mp4 with real staged product and brand assets."
+        : "Replace inferred asset slots with real Desktop-staged assets.",
       "Upgrade transcript coverage from OCR fallback to spoken transcription or approved copy.",
-      "Use preview-v1.md as the direct render checklist for the first playable preview.",
+      existsSync(renderPath)
+        ? "Cut blueprint-v2.json directly against the rendered preview timing."
+        : "Use preview-v1.md as the direct render checklist for the first playable preview.",
     ],
   });
 
@@ -1354,7 +1683,6 @@ export function summarizeBlueprintResult(result: BlueprintResult): string {
 export function summarizeJudgeResult(result: JudgeResult): string {
   return [
     `artifact_root=${result.artifactPaths.rootDir}`,
-    `judge=${join(result.artifactPaths.judgeDir, "judge-v1.json")}`,
     `approved=${result.judge.approved}`,
     `cache=${result.cached ? "reused" : "generated"}`,
   ].join("\n");
@@ -1363,7 +1691,8 @@ export function summarizeJudgeResult(result: JudgeResult): string {
 export function summarizeBuildResult(result: BuildResult): string {
   return [
     `artifact_root=${result.artifactPaths.rootDir}`,
-    `render_plan=${result.renderPlanPath}`,
+    `render_output=${result.renderOutputPath}`,
+    `build_metadata=${result.buildMetadataPath}`,
     `cache=${result.cached ? "reused" : "generated"}`,
   ].join("\n");
 }

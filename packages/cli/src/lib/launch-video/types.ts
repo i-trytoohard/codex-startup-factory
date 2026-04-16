@@ -1,6 +1,7 @@
 export const BLUEPRINT_SCHEMA_VERSION = "blueprint-schema-v1" as const;
 export const LAUNCH_FAMILY_SPEC_VERSION = "launch-family-spec-v1" as const;
 export const JUDGE_SCHEMA_VERSION = "judge-v1" as const;
+export type JudgeSchemaVersion = "judge-v1" | "judge-v2";
 
 export type LaunchFamilyRole = "hook" | "before" | "after" | "value-beats" | "outro";
 export type AnalysisStatus = "complete" | "partial";
@@ -243,7 +244,7 @@ export interface LaunchVideoBlueprintV1 {
 }
 
 export interface JudgeOutput {
-  version: typeof JUDGE_SCHEMA_VERSION;
+  version: JudgeSchemaVersion;
   generatedAt: string;
   artifactRoot: string;
   summary: string;
