@@ -110,7 +110,6 @@ export function registerLaunchVideo(program: Command): void {
         input?: string;
         artifactDir?: string;
         outputRoot: string;
-        assets?: string;
         projectName: string;
         force?: boolean;
       }) => {
@@ -118,7 +117,6 @@ export function registerLaunchVideo(program: Command): void {
           inputPath: options.input,
           artifactDir: options.artifactDir,
           outputRoot: options.outputRoot,
-          assetsPath: options.assets,
           projectName: options.projectName,
           force: options.force,
         });
@@ -128,7 +126,7 @@ export function registerLaunchVideo(program: Command): void {
 
   launchVideo
     .command("build")
-    .description("Create a render placeholder/build handoff for the persisted blueprint")
+    .description("Create a concrete render handoff for the persisted blueprint")
     .option("-i, --input <path>", "Reference video path")
     .option("--artifact-dir <path>", "Existing artifact directory")
     .option("-o, --output-root <path>", "Artifact root", DEFAULT_OUTPUT_ROOT)
@@ -155,7 +153,7 @@ export function registerLaunchVideo(program: Command): void {
 
   launchVideo
     .command("judge")
-    .description("Write a structured judge-v1.json review stub for the current blueprint")
+    .description("Write a structured judge-v1.json review for the current blueprint")
     .option("-i, --input <path>", "Reference video path")
     .option("--artifact-dir <path>", "Existing artifact directory")
     .option("-o, --output-root <path>", "Artifact root", DEFAULT_OUTPUT_ROOT)
@@ -182,7 +180,7 @@ export function registerLaunchVideo(program: Command): void {
 
   launchVideo
     .command("revise")
-    .description("Persist a revision plan stub from judge-v1.json")
+    .description("Persist the next revision target from judge-v1.json")
     .option("-i, --input <path>", "Reference video path")
     .option("--artifact-dir <path>", "Existing artifact directory")
     .option("-o, --output-root <path>", "Artifact root", DEFAULT_OUTPUT_ROOT)

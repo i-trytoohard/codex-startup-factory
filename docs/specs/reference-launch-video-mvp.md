@@ -1,17 +1,16 @@
 # Reference Launch Video MVP
 
-This repo now includes a pragmatic `ao launch-video` flow for a reference-driven launch-style video pipeline. The implementation persists analysis outputs so repeated loops can reuse scenes, keyframes, transcript state, blueprint seeds, blueprint output, judge output, and render placeholders without redoing the expensive parts.
+This repo now includes a pragmatic `ao launch-video` flow for a reference-driven launch-style video pipeline. The implementation persists reusable analysis, blueprint, judge, and render-plan outputs so later loops can iterate on the same reference without redoing extraction work when the file fingerprint has not changed.
 
 ## Artifact Tree
 
 Artifacts are written under:
 
 ```text
-/Users/suraj.markupgmail.com/Desktop/video-hackathon-mvp/<video-name>--<fingerprint>/
+/Users/suraj.markupgmail.com/Desktop/video-hackathon-mvp/
   reference/
     reference.json
-  assets/
-    README.md
+    assets.md
   analysis/
     metadata.json
     scenes.json
@@ -32,7 +31,7 @@ Artifacts are written under:
     preview-v1.md
 ```
 
-`preview-v1.md` is the explicit placeholder handoff for the later `preview-v1.mp4`.
+`preview-v1.md` is the current concrete build handoff. It maps scene timing, copy intent, assets, motion, palette, and editorial purpose for the next playable render.
 
 ## Blueprint Schema V1
 
@@ -64,6 +63,6 @@ The launch family roles are:
 
 - Analysis caches are keyed to reference path, size, and mtime.
 - The Desktop folder is the primary user-facing output surface for this MVP.
-- Scene detection is intentionally heuristic in this MVP so the artifact contract is visible now.
-- Transcript generation falls back to a clear stub when no transcription backend is available.
-- On macOS, keyframe extraction uses AVFoundation via a bundled Swift helper when `ffmpeg` is unavailable.
+- Scene detection is still heuristic, but the analysis bundle now includes real OCR text, palette extraction, and keyframe-difference motion signals from the actual reference frames.
+- Transcript generation currently uses a real OCR-derived partial fallback when speech transcription is unavailable.
+- On macOS, keyframe extraction and frame analysis use AVFoundation, Vision, and AppKit via a bundled Swift helper when `ffmpeg` is unavailable.

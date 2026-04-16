@@ -126,9 +126,8 @@ describe("launch video helpers", () => {
 
     const result = resolveArtifactPaths(inputPath, "/tmp/artifacts/reference");
 
-    expect(result.rootDir).toContain("/tmp/artifacts/reference/test.mp4--");
+    expect(result.rootDir).toBe("/tmp/artifacts/reference");
     expect(result.referenceDir).toBe(`${result.rootDir}/reference`);
-    expect(result.assetsDir).toBe(`${result.rootDir}/assets`);
     expect(result.analysisDir).toBe(`${result.rootDir}/analysis`);
     expect(result.blueprintsDir).toBe(`${result.rootDir}/blueprints`);
     expect(result.judgeDir).toBe(`${result.rootDir}/judge`);

@@ -3,11 +3,11 @@ export const LAUNCH_FAMILY_SPEC_VERSION = "launch-family-spec-v1" as const;
 export const JUDGE_SCHEMA_VERSION = "judge-v1" as const;
 
 export type LaunchFamilyRole = "hook" | "before" | "after" | "value-beats" | "outro";
+export type AnalysisStatus = "complete" | "partial";
 
 export interface ArtifactPaths {
   rootDir: string;
   referenceDir: string;
-  assetsDir: string;
   analysisDir: string;
   blueprintsDir: string;
   judgeDir: string;
@@ -20,10 +20,13 @@ export interface ReferenceMetadata {
   fileName: string;
   artifactKey: string;
   fingerprint: string;
+  fileSizeBytes: number;
+  modifiedAt: string;
   durationSeconds: number | null;
   width: number | null;
   height: number | null;
   aspectRatio: string | null;
+  nominalFrameRate: number | null;
   videoCodec: string | null;
   audioCodec: string | null;
   hasAudio: boolean;
@@ -36,7 +39,7 @@ export interface ReferenceMetadata {
     swiftAvailable: boolean;
     whisperAvailable: boolean;
     sceneDetection: "heuristic-duration-slices";
-    transcription: "stub-missing-dependency" | "whisper";
+    transcription: "visual-ocr-fallback" | "stub-missing-dependency" | "whisper";
     keyframeExtractor: "ffmpeg" | "swift-avfoundation" | "none";
   };
 }
@@ -50,29 +53,53 @@ export interface AnalysisScene {
   endSeconds: number;
   durationSeconds: number;
   keyframePath: string | null;
-  intent: string;
+  detectedText: string[];
+  copyIntent: string;
+  editorialPurpose: string;
+  assetSignals: {
+    used: string[];
+    needed: string[];
+    confidence: "observed" | "inferred" | "missing";
+  };
+  motionDirectives: string[];
+  transition: string;
+  palette: string[];
+  typographyHints: string[];
+  energyScore: number;
+  analysisStatus: AnalysisStatus;
+  evidence: string[];
   notes: string[];
   detectionMethod: "heuristic-duration-slices";
 }
 
+export interface TranscriptSegment {
+  id: string;
+  startSeconds: number;
+  endSeconds: number;
+  text: string;
+  source: "speech" | "ocr";
+  confidence: number;
+  partial: boolean;
+}
+
 export interface TranscriptOutput {
-  status: "available" | "stub";
-  provider: "whisper" | "none";
+  status: "available" | "partial" | "stub";
+  provider: "whisper" | "visual-ocr-fallback" | "none";
   language: string | null;
-  segments: Array<{
-    startSeconds: number;
-    endSeconds: number;
-    text: string;
-  }>;
-  todo: string[];
+  summary: string;
+  segments: TranscriptSegment[];
+  caveats: string[];
 }
 
 export interface AudioEvent {
   id: string;
-  type: "music-bed" | "riser" | "whoosh" | "cta-hit" | "voiceover-placeholder";
+  type: "music-bed" | "transition-hit" | "emphasis-rise" | "cta-hit" | "voiceover-window";
   startSeconds: number;
   endSeconds: number;
   inferred: boolean;
+  confidence: number;
+  sceneId: string | null;
+  evidence: string[];
   notes: string;
 }
 
@@ -84,14 +111,33 @@ export interface StyleAnalysis {
     resolution: string | null;
     durationBucket: "short" | "medium" | "long";
   };
+  palette: {
+    dominant: string[];
+    accent: string[];
+    backgroundBias: string[];
+  };
+  typography: {
+    observedTextLines: string[];
+    casing: string;
+    density: "low" | "medium" | "high";
+  };
+  composition: string[];
   notes: string[];
+  analysisStatus: AnalysisStatus;
 }
 
 export interface MotionAnalysis {
   summary: string;
   pace: "slow" | "medium" | "fast";
   cameraEnergy: "low" | "medium" | "high";
+  transitionProfile: Array<{
+    fromSceneId: string;
+    toSceneId: string;
+    differenceScore: number;
+    interpretation: string;
+  }>;
   notes: string[];
+  analysisStatus: AnalysisStatus;
 }
 
 export interface EditorialAnalysis {
@@ -99,21 +145,35 @@ export interface EditorialAnalysis {
   structure: Array<{
     role: LaunchFamilyRole;
     purpose: string;
+    sceneId: string;
   }>;
+  pacingNotes: string[];
+  openingObservation: string;
+  closingObservation: string;
   notes: string[];
+  analysisStatus: AnalysisStatus;
 }
 
 export interface BlueprintScene {
   id: string;
   role: LaunchFamilyRole;
   beatIndex: number | null;
-  objective: string;
-  referenceSceneId: string;
-  sourceKeyframePath: string | null;
-  copyPrompt: string;
-  visualDirection: string[];
-  assetNeeds: string[];
+  startSeconds: number;
+  endSeconds: number;
   durationSeconds: number;
+  referenceSceneId: string;
+  referenceEvidence: string[];
+  sourceKeyframePath: string | null;
+  detectedText: string[];
+  copyIntent: string;
+  editorialPurpose: string;
+  assetsUsed: string[];
+  assetsNeeded: string[];
+  motionDirectives: string[];
+  transition: string;
+  palette: string[];
+  typographyHints: string[];
+  outputIntent: string;
 }
 
 export interface LaunchVideoBlueprintV1 {
@@ -136,40 +196,49 @@ export interface LaunchVideoBlueprintV1 {
     analysisPaths: string[];
   };
   assets: {
-    product: string[];
-    brand: string[];
-    proof: string[];
-    ui: string[];
-    extra: string[];
-    missing: string[];
+    used: string[];
+    needed: string[];
+    available: string[];
+    stagingPath: string;
   };
   style: {
     northStar: string;
+    palette: string[];
+    typography: string[];
     guardrails: string[];
     referenceNotes: string[];
   };
   audio: {
-    voiceoverStatus: "pending" | "ready";
+    voiceoverStatus: "pending" | "partial" | "ready";
+    transcriptPath: string;
     soundtrackDirection: string[];
     eventsPath: string;
-    transcriptPath: string;
   };
   performance: {
     targetDurationSeconds: number | null;
     hookTargetSeconds: number;
+    pacingStrategy: string;
     primaryCTA: string;
     successCriteria: string[];
   };
   editorial: {
     familySpecVersion: typeof LAUNCH_FAMILY_SPEC_VERSION;
     arcSummary: string;
+    pacingNotes: string[];
     notes: string[];
   };
   scenes: BlueprintScene[];
   judge: {
     status: "pending" | "reviewed";
     judgePath: string;
-    thresholds: Record<string, number>;
+    thresholds: {
+      structure: number;
+      timing: number;
+      typography: number;
+      palette: number;
+      motion: number;
+      emotional_tone: number;
+    };
   };
 }
 
@@ -178,7 +247,14 @@ export interface JudgeOutput {
   generatedAt: string;
   artifactRoot: string;
   summary: string;
-  scores: Record<string, number>;
+  scores: {
+    structure: number;
+    timing: number;
+    typography: number;
+    palette: number;
+    motion: number;
+    emotional_tone: number;
+  };
   top_fixes: string[];
   revision_notes: string[];
   approved: boolean;

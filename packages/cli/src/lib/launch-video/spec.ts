@@ -1,4 +1,4 @@
-import type { BlueprintScene, LaunchFamilyRole } from "./types.js";
+import type { LaunchFamilyRole } from "./types.js";
 
 export interface LaunchFamilyRoleSpec {
   role: LaunchFamilyRole;
@@ -56,10 +56,16 @@ export const launchFamilySpecV1: LaunchFamilyRoleSpec[] = [
   },
 ];
 
+export interface BlueprintSceneDefaults {
+  copyPrompt: string;
+  visualDirection: string[];
+  assetNeeds: string[];
+}
+
 export function createBlueprintSceneDefaults(
   role: LaunchFamilyRole,
   beatIndex: number | null,
-): Pick<BlueprintScene, "copyPrompt" | "visualDirection" | "assetNeeds"> {
+): BlueprintSceneDefaults {
   const match = launchFamilySpecV1.find((item) => item.role === role);
   if (!match) {
     return {
