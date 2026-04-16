@@ -36,59 +36,10 @@ function getCategoryVisual(cat) {
   return visuals[cat.id] || 'Wedding';
 }
 
-function getCategoryPlaceholderImage(catId, index) {
-  const images = {
-    venue: [
-      'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=400&q=75',
-      'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=400&q=75',
-      'https://images.unsplash.com/photo-1505236858219-8359eb29e329?w=400&q=75',
-      'https://images.unsplash.com/photo-1478146059778-26028b07395a?w=400&q=75',
-    ],
-    catering: [
-      'https://images.unsplash.com/photo-1555244162-803834f70033?w=400&q=75',
-      'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&q=75',
-      'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=75',
-      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=75',
-    ],
-    clothing: [
-      'https://images.unsplash.com/photo-1594552072238-5765e9b4c8c4?w=400&q=75',
-      'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&q=75',
-      'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=400&q=75',
-      'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&q=75',
-    ],
-    decor: [
-      'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&q=75',
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=75',
-      'https://images.unsplash.com/photo-1510076857177-7470076d4098?w=400&q=75',
-    ],
-    photo: [
-      'https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=400&q=75',
-      'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=400&q=75',
-      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=400&q=75',
-    ],
-    music: [
-      'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&q=75',
-      'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&q=75',
-      'https://images.unsplash.com/photo-1501612780327-45045538702b?w=400&q=75',
-    ],
-    beauty: [
-      'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400&q=75',
-      'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&q=75',
-      'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=400&q=75',
-    ],
-    invite: [
-      'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=400&q=75',
-      'https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=400&q=75',
-      'https://images.unsplash.com/photo-1513623954550-0c4802e1cedf?w=400&q=75',
-    ],
-  };
-  const arr = images[catId] || images.venue;
-  return arr[index % arr.length];
-}
 
 function renderVendorMedia(cat, imageUrl, title) {
   if (imageUrl) {
-    return `<div class="vendor-media"><img src="${imageUrl}" alt="${escapeHtml(title)}"></div>`;
+    return `<div class="vendor-media"><img src="${imageUrl}" alt="${escapeHtml(title)}" onerror="this.style.display='none';this.parentElement.classList.add('vendor-media--broken')"></div>`;
   }
   return `
     <div class="vendor-media">
@@ -266,7 +217,7 @@ async function renderVendorPage() {
     let html = '';
 
     if (apiResults.length > 0) {
-      html += `<div style="font-size:0.8rem;color:var(--purple);margin-bottom:0.6rem;font-weight:500;">Real Google Places results (${plan.city})</div>`;
+      html += `<div class="section-label"><span style="color:var(--purple);">📍 Real Google Places results — ${plan.city}</span></div>`;
       for (const r of apiResults) {
         const stars = r.rating > 0 ? '⭐'.repeat(Math.round(r.rating)) : '';
         const openTag = r.isOpen === true
@@ -295,17 +246,15 @@ async function renderVendorPage() {
           </div>
         `;
       }
-      html += '<div style="font-size:0.8rem;color:var(--text-muted);margin:0.8rem 0 0.4rem;">Curated budget options</div>';
+      html += '<div class="section-label">Curated Options</div>';
     }
 
-    for (let vi = 0; vi < curated.length; vi++) {
-      const v = curated[vi];
+    for (const v of curated) {
       const tags = (v.tags || []).map((t) => `<span class="tag tag-${t}">${t === 'best' ? 'Best Value' : t === 'premium' ? 'Premium' : 'Budget Friendly'}</span>`).join(' ');
       const price = v.isPerPlate ? `${formatINR(v.perPlate)}/plate` : formatINR(v.price);
-      const placeholderImg = getCategoryPlaceholderImage(cat.id, vi);
       html += `
         <div class="vendor-card">
-          ${renderVendorMedia(cat, placeholderImg, v.name)}
+          ${renderVendorMedia(cat, '', v.name)}
           <div class="vendor-card__body">
             <div class="vendor-top">
               <div>

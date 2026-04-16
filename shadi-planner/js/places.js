@@ -2,14 +2,14 @@ function saveApiKey() {
   const input = document.getElementById('apiKeyInput');
   if (!input) return;
   const key = input.value.trim();
-  if (!key) return;
+  if (!key || key.length < 20) return;
   apiKey = key;
   localStorage.setItem('sp_google_api_key', key);
   loadGooglePlaces();
 }
 
 function loadGooglePlaces() {
-  if (!apiKey || document.getElementById('gplaces-script')) return;
+  if (!apiKey || apiKey.length < 20 || document.getElementById('gplaces-script')) return;
   const status = document.getElementById('apiStatus');
   if (!status) return;
   status.textContent = 'Loading Google Places API...';
@@ -28,9 +28,12 @@ function loadGooglePlaces() {
     placesService = new google.maps.places.PlacesService(div);
   };
   script.onerror = () => {
-    status.textContent = 'API load failed. Check your key.';
+    status.textContent = 'API load failed. Check your key and ensure Places API is enabled.';
     status.className = 'api-status error';
     apiKey = '';
+    localStorage.removeItem('sp_google_api_key');
+    const existingScript = document.getElementById('gplaces-script');
+    if (existingScript) existingScript.remove();
   };
   document.head.appendChild(script);
 }

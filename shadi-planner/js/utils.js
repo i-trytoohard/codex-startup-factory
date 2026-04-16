@@ -12,10 +12,13 @@ function renderSkeletonCards(count) {
   let html = '';
   for (let i = 0; i < count; i++) {
     html += `<div class="skeleton-card">
-      <div class="skeleton-line thick w70"></div>
-      <div class="skeleton-line w90"></div>
-      <div class="skeleton-line w50"></div>
-      <div class="skeleton-line w40"></div>
+      <div class="skeleton-img"></div>
+      <div class="skeleton-body">
+        <div class="skeleton-line thick w70"></div>
+        <div class="skeleton-line w90"></div>
+        <div class="skeleton-line w50"></div>
+        <div class="skeleton-line w40"></div>
+      </div>
     </div>`;
   }
   return html;
