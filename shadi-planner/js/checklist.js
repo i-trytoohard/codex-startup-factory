@@ -1,33 +1,35 @@
 function renderChecklist(functions) {
   const saved = JSON.parse(localStorage.getItem('sp_checklist') || '{}');
+  const plan = getPlanData();
+  const functionCount = functions || plan?.functions || 2;
   const items = [
-    { id: 'venue', text: 'Venue / Hall finalize karna', months: '3-4 months pehle' },
-    { id: 'catering', text: 'Caterer finalize + menu tasting', months: '2-3 months pehle' },
-    { id: 'photo', text: 'Photographer + Videographer book karna', months: '2-3 months pehle' },
-    { id: 'lehenga', text: 'Dulhan ka lehenga / outfit select karna', months: '2-3 months pehle' },
-    { id: 'sherwani', text: 'Dulha ka sherwani / suit select karna', months: '1-2 months pehle' },
-    { id: 'decor', text: 'Decorator se milna + theme decide karna', months: '1-2 months pehle' },
-    { id: 'invite', text: 'Cards / Invitations bhejne', months: '1-2 months pehle' },
-    { id: 'dj', text: 'DJ / Band / Entertainment book karna', months: '1-2 months pehle' },
-    { id: 'mehndi_artist', text: 'Mehndi artist book karna', months: '1 month pehle' },
-    { id: 'makeup', text: 'Makeup artist + trial session', months: '1 month pehle' },
-    { id: 'guest', text: 'Guest list finalize karna', months: '1 month pehle' },
-    { id: 'pandit', text: 'Pandit ji / Maulvi sahab se baat karna', months: '2-3 weeks pehle' },
-    { id: 'transport', text: 'Gaadi / Transport arrange karna (Baraat)', months: '2 weeks pehle' },
-    { id: 'jewellery', text: 'Jewellery finalize karna', months: '1 month pehle' },
-    { id: 'trousseau', text: 'Family ke kapde / trousseau ready karna', months: '2 weeks pehle' },
-    { id: 'hotel', text: 'Bahar se aane wale guests ke liye hotel book karna', months: '1 month pehle' },
-    { id: 'prewed', text: 'Pre-wedding shoot complete karna', months: '2-3 weeks pehle' },
+    { id: 'venue', text: 'Finalize venue or hall', months: '3-4 months before' },
+    { id: 'catering', text: 'Finalize caterer and schedule menu tasting', months: '2-3 months before' },
+    { id: 'photo', text: 'Book photographer and videographer', months: '2-3 months before' },
+    { id: 'lehenga', text: 'Select bridal outfit', months: '2-3 months before' },
+    { id: 'sherwani', text: 'Select groom outfit', months: '1-2 months before' },
+    { id: 'decor', text: 'Meet decorator and decide theme', months: '1-2 months before' },
+    { id: 'invite', text: 'Send invitations', months: '1-2 months before' },
+    { id: 'dj', text: 'Book DJ / band / entertainment', months: '1-2 months before' },
+    { id: 'mehndi_artist', text: 'Book mehndi artist', months: '1 month before' },
+    { id: 'makeup', text: 'Book makeup artist and schedule trial', months: '1 month before' },
+    { id: 'guest', text: 'Finalize guest list', months: '1 month before' },
+    { id: 'pandit', text: 'Confirm ceremony officiant', months: '2-3 weeks before' },
+    { id: 'transport', text: 'Arrange transport for baraat', months: '2 weeks before' },
+    { id: 'jewellery', text: 'Finalize jewellery', months: '1 month before' },
+    { id: 'trousseau', text: 'Prepare family outfits and trousseau', months: '2 weeks before' },
+    { id: 'hotel', text: 'Book hotel for out-of-town guests', months: '1 month before' },
+    { id: 'prewed', text: 'Finish pre-wedding shoot', months: '2-3 weeks before' },
   ];
-  if (functions >= 3) items.push({ id: 'mehndi_fn', text: 'Mehndi function ka setup plan karna', months: '1 week pehle' });
-  if (functions >= 5) {
-    items.push({ id: 'sangeet', text: 'Sangeet choreography practice karna', months: '2-3 weeks pehle' });
-    items.push({ id: 'haldi', text: 'Haldi ceremony ka samaan lena', months: '1 week pehle' });
+  if (functionCount >= 3) items.push({ id: 'mehndi_fn', text: 'Plan Mehndi function setup', months: '1 week before' });
+  if (functionCount >= 5) {
+    items.push({ id: 'sangeet', text: 'Practice Sangeet choreography', months: '2-3 weeks before' });
+    items.push({ id: 'haldi', text: 'Buy Haldi ceremony essentials', months: '1 week before' });
   }
   items.push(
-    { id: 'final_venue', text: 'Venue ka final walkthrough karna', months: '1 week pehle' },
-    { id: 'emergency', text: 'Emergency kit ready karna (safety pins, first aid)', months: '2 days pehle' },
-    { id: 'timeline', text: 'Day-of timeline bana ke sabko share karna', months: '3 days pehle' },
+    { id: 'final_venue', text: 'Do final venue walkthrough', months: '1 week before' },
+    { id: 'emergency', text: 'Prepare emergency kit (safety pins, first aid)', months: '2 days before' },
+    { id: 'timeline', text: 'Create and share the day-of timeline', months: '3 days before' },
   );
 
   const grid = document.getElementById('checklistGrid');

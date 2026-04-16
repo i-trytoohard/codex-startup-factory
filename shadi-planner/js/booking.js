@@ -6,7 +6,7 @@ function openBooking(vendorName, vendorPrice, vendorCategory) {
   document.getElementById('bookingFormView').style.display = 'block';
   document.getElementById('bookingProcessing').style.display = 'none';
   document.getElementById('bookingConfirmed').style.display = 'none';
-  const guestVal = document.getElementById('guestInput').value;
+  const guestVal = document.getElementById('guestInput')?.value;
   if (guestVal) document.getElementById('bookGuests').value = guestVal;
   document.getElementById('bookingModal').classList.add('visible');
 }
@@ -16,7 +16,7 @@ function closeBookingModal() {
   currentBookingVendor = null;
 }
 
-document.getElementById('bookingModal').addEventListener('click', (e) => {
+document.getElementById('bookingModal')?.addEventListener('click', (e) => {
   if (e.target === e.currentTarget) closeBookingModal();
 });
 
@@ -24,19 +24,19 @@ async function submitBooking() {
   const name = document.getElementById('bookName').value.trim();
   const phone = document.getElementById('bookPhone').value.trim();
   const date = document.getElementById('bookDate').value;
-  if (!name) { alert('Apna naam daalein!'); return; }
-  if (!phone || phone.length < 10) { alert('Sahi phone number daalein!'); return; }
-  if (!date) { alert('Shadi ki date select karein!'); return; }
+  if (!name) { alert('Please enter your name.'); return; }
+  if (!phone || phone.length < 10) { alert('Please enter a valid phone number.'); return; }
+  if (!date) { alert('Please select a wedding date.'); return; }
 
   document.getElementById('bookingFormView').style.display = 'none';
   document.getElementById('bookingProcessing').style.display = 'block';
   const stepEl = document.getElementById('bookingStep');
 
   const steps = [
-    'Vendor availability check kar rahe hain...',
-    'Selected date ke liye slot confirm ho raha hai...',
-    'Aapki details vendor ko bhej rahe hain...',
-    'Booking reference generate ho rahi hai...',
+    'Checking vendor availability...',
+    'Confirming slot for selected date...',
+    'Sending your details to the vendor...',
+    'Generating booking reference...',
   ];
 
   for (let i = 0; i < steps.length; i++) {

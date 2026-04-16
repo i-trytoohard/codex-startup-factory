@@ -1,5 +1,7 @@
 function saveApiKey() {
-  const key = document.getElementById('apiKeyInput').value.trim();
+  const input = document.getElementById('apiKeyInput');
+  if (!input) return;
+  const key = input.value.trim();
   if (!key) return;
   apiKey = key;
   localStorage.setItem('sp_google_api_key', key);
@@ -9,6 +11,7 @@ function saveApiKey() {
 function loadGooglePlaces() {
   if (!apiKey || document.getElementById('gplaces-script')) return;
   const status = document.getElementById('apiStatus');
+  if (!status) return;
   status.textContent = 'Loading Google Places API...';
   status.className = 'api-status';
 
@@ -33,8 +36,11 @@ function loadGooglePlaces() {
 }
 
 if (apiKey) {
-  document.getElementById('apiKeyInput').value = apiKey;
-  loadGooglePlaces();
+  const input = document.getElementById('apiKeyInput');
+  if (input) {
+    input.value = apiKey;
+    loadGooglePlaces();
+  }
 }
 
 function searchPlaces(query, city) {

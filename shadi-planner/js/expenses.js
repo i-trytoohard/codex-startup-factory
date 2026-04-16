@@ -22,6 +22,9 @@ function renderExpenses() {
   const remEl = document.getElementById('totalRemaining');
   if (!list) return;
 
+  const plan = getPlanData();
+  if (plan?.budget) currentBudget = plan.budget;
+
   const total = expenses.reduce((s, e) => s + e.amount, 0);
   const pct = currentBudget > 0 ? Math.min((total / currentBudget) * 100, 100) : 0;
 
@@ -31,7 +34,7 @@ function renderExpenses() {
   spentEl.textContent = formatINR(total);
   remEl.textContent = formatINR(Math.max(currentBudget - total, 0));
 
-  list.innerHTML = expenses.length === 0 ? '<div class="no-results">Abhi tak koi kharcha add nahi kiya</div>' :
+  list.innerHTML = expenses.length === 0 ? '<div class="no-results">No expenses added yet</div>' :
     expenses.map(e => `
       <div class="expense-item">
         <span class="exp-name">${escapeHtml(e.name)}</span>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,26 +17,37 @@
 
 <header>
   <h1>Shadi Planner</h1>
-  <p>Apni shadi ka poora plan banayein - budget ke hisaab se, real venues ke saath</p>
+  <p class="subtitle">Plan your dream wedding on a smart budget with real venues</p>
+  <span class="tagline">Smart Wedding Planning</span>
 </header>
 
+<nav class="top-nav">
+  <div class="top-nav__inner">
+    <a class="top-nav__brand" href="./index.html">Shadi Planner</a>
+    <a class="top-nav__link active" href="./index.html">Home</a>
+    <a class="top-nav__link" href="./vendors.html">Vendors</a>
+    <a class="top-nav__link" href="./budget.html">Budget</a>
+    <a class="top-nav__link" href="./tracker.html">Tracker</a>
+    <a class="top-nav__link" href="./checklist.html">Checklist</a>
+  </div>
+</nav>
+
 <div class="container">
-  <!-- Setup -->
   <div class="setup-section">
-    <h2>Shadi Details Bharein</h2>
+    <h2>Enter Your Wedding Details</h2>
     <div class="form-grid">
       <div class="form-group">
-        <label>Sheher / City</label>
+        <label>City</label>
         <input type="text" id="cityInput" class="form-input" placeholder="e.g. Delhi, Mumbai, Jaipur">
       </div>
       <div class="form-group">
-        <label>Mehmaano ki Tadaad (Guests)</label>
+        <label>Number of Guests</label>
         <input type="number" id="guestInput" class="form-input" placeholder="e.g. 300" min="20" max="5000" value="200">
       </div>
       <div class="form-group">
-        <label>Shadi ka Type</label>
+        <label>Wedding Type</label>
         <select id="weddingType" class="form-input">
-          <option value="traditional">Traditional / Riwayati</option>
+          <option value="traditional">Traditional</option>
           <option value="modern">Modern / Contemporary</option>
           <option value="destination">Destination Wedding</option>
           <option value="intimate">Intimate / Close Family</option>
@@ -45,10 +56,10 @@
       <div class="form-group">
         <label>Functions</label>
         <select id="functionCount" class="form-input">
-          <option value="1">Sirf Shadi (1 day)</option>
-          <option value="2" selected>Shadi + Reception (2 days)</option>
-          <option value="3">Mehndi + Shadi + Reception (3 days)</option>
-          <option value="5">Full - Haldi, Mehndi, Sangeet, Shadi, Reception</option>
+          <option value="1">Wedding Only (1 day)</option>
+          <option value="2" selected>Wedding + Reception (2 days)</option>
+          <option value="3">Mehndi + Wedding + Reception (3 days)</option>
+          <option value="5">Full - Haldi, Mehndi, Sangeet, Wedding, Reception</option>
         </select>
       </div>
       <div class="form-group full">
@@ -61,24 +72,23 @@
           <span>&#8377;50 Lakh</span>
         </div>
         <div style="display:flex;gap:0.5rem;align-items:center;justify-content:center;margin-top:0.5rem;">
-          <span style="color:var(--text-muted);font-size:0.85rem;">ya type karo:</span>
+          <span style="color:var(--text-muted);font-size:0.85rem;">or type amount:</span>
           <input type="number" id="budgetInput" class="form-input" placeholder="e.g. 500000" min="50000" max="50000000" style="width:180px;text-align:center;">
         </div>
       </div>
 
-      <!-- Google Places API Key -->
       <div class="form-group full">
         <details class="api-setup">
-          <summary>Google Places API Key (Real venue search ke liye)</summary>
-          <p style="margin-top:0.6rem;">Apne city ke real marriage halls, banquets, hotels dhundhne ke liye Google Places API key chahiye. Bina key ke bhi app kaam karega curated data ke saath.</p>
+          <summary>Google Places API Key (for real venue search)</summary>
+          <p style="margin-top:0.6rem;">To search real marriage halls, banquets, and hotels in your city, you need a Google Places API key. The app works without one using curated data.</p>
           <ol class="steps">
-            <li>Google Cloud Console pe jaao (console.cloud.google.com)</li>
-            <li>Naya project banao ya existing use karo</li>
-            <li>"Places API" aur "Maps JavaScript API" enable karo</li>
-            <li>Credentials se API key generate karo</li>
+            <li>Go to Google Cloud Console (console.cloud.google.com)</li>
+            <li>Create a new project or use an existing one</li>
+            <li>Enable "Places API" and "Maps JavaScript API"</li>
+            <li>Generate an API key from Credentials</li>
           </ol>
           <div class="api-key-input">
-            <input type="password" id="apiKeyInput" class="form-input" placeholder="API key paste karo" style="font-size:0.85rem;">
+            <input type="password" id="apiKeyInput" class="form-input" placeholder="Paste your API key" style="font-size:0.85rem;">
             <button class="btn btn-outline" onclick="saveApiKey()">Save</button>
           </div>
           <div class="api-status" id="apiStatus"></div>
@@ -88,116 +98,15 @@
 
     <div class="btn-center">
       <button class="btn btn-primary" id="planBtn" onclick="generatePlan()">
-        Shadi Plan Banao!
+        Generate Wedding Plan!
       </button>
-    </div>
-  </div>
-
-  <!-- Results -->
-  <div class="results" id="results">
-    <div class="tabs">
-      <button class="tab active" data-tab="vendors">Vendors & Venues</button>
-      <button class="tab" data-tab="budget">Budget Breakdown</button>
-      <button class="tab" data-tab="tracker">Expense Tracker</button>
-      <button class="tab" data-tab="checklist">Checklist</button>
-    </div>
-
-    <!-- Tab: Vendors -->
-    <div class="tab-content active" id="tab-vendors">
-      <div id="categoriesContainer"></div>
-    </div>
-
-    <!-- Tab: Budget -->
-    <div class="tab-content" id="tab-budget">
-      <div class="breakdown-grid" id="breakdownGrid"></div>
-      <div class="tips" id="tipsSection"></div>
-    </div>
-
-    <!-- Tab: Expense Tracker -->
-    <div class="tab-content" id="tab-tracker">
-      <div class="expense-tracker">
-        <h3>Kharcha Track Karo</h3>
-        <div class="expense-bar-bg">
-          <div class="expense-bar-fill" id="expenseBar" style="width:0%;background:var(--green);">0%</div>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:0.8rem;color:var(--text-secondary);margin-bottom:1rem;">
-          <span>Spent: <strong id="totalSpent" style="color:var(--green);">&#8377;0</strong></span>
-          <span>Remaining: <strong id="totalRemaining" style="color:var(--gold);">&#8377;0</strong></span>
-        </div>
-        <div class="expense-row">
-          <input type="text" id="expName" class="form-input" placeholder="Kharche ka naam">
-          <input type="number" id="expAmount" class="form-input" placeholder="Amount" style="width:130px;">
-          <button class="btn btn-outline" onclick="addExpense()">Add</button>
-        </div>
-        <div class="expense-list" id="expenseList"></div>
-      </div>
-    </div>
-
-    <!-- Tab: Checklist -->
-    <div class="tab-content" id="tab-checklist">
-      <div class="checklist">
-        <h3>Shadi Checklist</h3>
-        <div class="check-grid" id="checklistGrid"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Booking Modal -->
-<div class="modal-overlay" id="bookingModal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeBookingModal()">&times;</button>
-    <div id="bookingFormView">
-      <h3>Book Now</h3>
-      <div class="modal-vendor" id="bookingVendorName"></div>
-      <div class="form-group">
-        <label>Aapka Naam (Full Name)</label>
-        <input type="text" id="bookName" class="form-input" placeholder="e.g. Rahul Sharma">
-      </div>
-      <div class="form-group">
-        <label>Phone Number</label>
-        <input type="tel" id="bookPhone" class="form-input" placeholder="e.g. 98765 43210">
-      </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="bookEmail" class="form-input" placeholder="e.g. rahul@gmail.com">
-      </div>
-      <div class="form-group">
-        <label>Shadi ki Date</label>
-        <input type="date" id="bookDate" class="form-input">
-      </div>
-      <div class="form-group">
-        <label>Mehmaano ki Tadaad (Approx Guests)</label>
-        <input type="number" id="bookGuests" class="form-input" placeholder="e.g. 300" min="10" max="5000">
-      </div>
-      <div class="form-group">
-        <label>Special Requests (Optional)</label>
-        <textarea id="bookNotes" class="form-input" rows="2" placeholder="e.g. Pure veg, Jain food bhi chahiye, stage extra bada..."></textarea>
-      </div>
-      <button class="btn btn-primary" onclick="submitBooking()">Confirm Booking Request</button>
-    </div>
-    <div id="bookingProcessing" class="booking-processing" style="display:none;">
-      <div class="spinner-large"></div>
-      <p>Booking process ho rahi hai...</p>
-      <div class="step" id="bookingStep">Vendor availability check kar rahe hain...</div>
-    </div>
-    <div id="bookingConfirmed" class="booking-confirmed" style="display:none;">
-      <div class="check-icon">&#10003;</div>
-      <h4>Booking Request Confirmed!</h4>
-      <div class="booking-id" id="confirmBookingId"></div>
-      <div class="booking-details" id="confirmDetails"></div>
-      <div class="booking-note">Vendor aapko 24-48 ghante mein call karega confirmation ke liye. Yeh booking request hai — final confirmation vendor ki taraf se hogi.</div>
-      <button class="btn btn-outline" style="margin-top:1rem;" onclick="closeBookingModal()">Done</button>
     </div>
   </div>
 </div>
 
 <footer>Shadi Planner &mdash; Smart budget wedding planning tool</footer>
 
-<!-- Config (loaded before app scripts) -->
 <script src="./config.local.js"></script>
-
-<!-- Application Scripts (order matters) -->
 <script src="./js/utils.js"></script>
 <script src="./js/state.js"></script>
 <script src="./js/budget.js"></script>
