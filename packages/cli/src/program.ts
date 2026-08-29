@@ -14,6 +14,7 @@ import { registerUpdate } from "./commands/update.js";
 import { registerSetup } from "./commands/setup.js";
 import { registerPlugin } from "./commands/plugin.js";
 import { registerLaunchVideo } from "./commands/launch-video.js";
+import { registerPodcast } from "./commands/podcast.js";
 import { getConfigInstruction } from "./lib/config-instruction.js";
 import { getCliVersion } from "./options/version.js";
 
@@ -42,6 +43,7 @@ export function createProgram(): Command {
   registerSetup(program);
   registerPlugin(program);
   registerLaunchVideo(program);
+  registerPodcast(program);
 
   program
     .command("config-help")

@@ -1,7 +1,6 @@
 import chalk from "chalk";
 import ora from "ora";
 import type { Command } from "commander";
-import { resolve } from "node:path";
 import {
   loadConfig,
   TERMINAL_STATUSES,
@@ -12,42 +11,8 @@ import { exec } from "../lib/shell.js";
 import { banner } from "../lib/format.js";
 import { getSessionManager } from "../lib/create-session-manager.js";
 import { preflight } from "../lib/preflight.js";
-import { findProjectForDirectory } from "../lib/project-resolution.js";
+import { autoDetectProject } from "../lib/project-resolution.js";
 import { getRunning } from "../lib/running-state.js";
-
-/**
- * Auto-detect the project ID from the config.
- * - If only one project exists, use it.
- * - If multiple projects exist, match cwd against project paths.
- * - Falls back to AO_PROJECT_ID env var (set when called from an agent session).
- */
-function autoDetectProject(config: OrchestratorConfig): string {
-  const projectIds = Object.keys(config.projects);
-  if (projectIds.length === 0) {
-    throw new Error("No projects configured. Run 'ao start' first.");
-  }
-  if (projectIds.length === 1) {
-    return projectIds[0];
-  }
-
-  // Try AO_PROJECT_ID env var (set by AO when spawning agent sessions)
-  const envProject = process.env.AO_PROJECT_ID;
-  if (envProject && config.projects[envProject]) {
-    return envProject;
-  }
-
-  // Try matching cwd to a project path
-  const cwd = resolve(process.cwd());
-  const matchedProjectId = findProjectForDirectory(config.projects, cwd);
-  if (matchedProjectId) {
-    return matchedProjectId;
-  }
-
-  throw new Error(
-    `Multiple projects configured. Specify one: ${projectIds.join(", ")}\n` +
-      `Or run from within a project directory.`,
-  );
-}
 
 interface SpawnClaimOptions {
   claimPr?: string;

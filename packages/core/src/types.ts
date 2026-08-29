@@ -228,16 +228,24 @@ export interface SessionSpawnConfig {
   issueId?: string;
   branch?: string;
   prompt?: string;
+  /** Optional system/developer prompt passed directly to the agent plugin. */
+  systemPrompt?: string;
+  /** Controls whether prompt-builder wraps the prompt with AO coding instructions. */
+  promptMode?: "managed" | "raw";
   /** Override the agent plugin for this session (e.g. "codex", "claude-code") */
   agent?: string;
   /** Override the OpenCode subagent for this session (e.g. "sisyphus", "oracle") */
   subagent?: string;
+  /** Extra metadata persisted on the session record. */
+  metadata?: Record<string, string>;
 }
 
 /** Config for creating an orchestrator session */
 export interface OrchestratorSpawnConfig {
   projectId: string;
   systemPrompt?: string;
+  /** Extra metadata persisted on the session record. */
+  metadata?: Record<string, string>;
 }
 
 // =============================================================================
