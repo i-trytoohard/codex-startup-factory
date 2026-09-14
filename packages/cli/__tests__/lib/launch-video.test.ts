@@ -1,6 +1,7 @@
 import { mkdtemp, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   buildBuilderScaffold,
@@ -9,6 +10,8 @@ import {
   resolveLaunchVideoPaths,
   type RawReferenceAnalysis,
 } from "../../src/lib/launch-video.js";
+import { getSwiftToolPath, resolveArtifactPaths } from "../../src/lib/launch-video/pipeline.js";
+import { launchFamilySpecV1 } from "../../src/lib/launch-video/spec.js";
 
 const rawAnalysis: RawReferenceAnalysis = {
   inputPath: "/tmp/reference.mp4",
@@ -84,7 +87,7 @@ const rawAnalysis: RawReferenceAnalysis = {
   ],
 };
 
-describe("launch-video helpers", () => {
+describe("launch video helpers", () => {
   it("derives scene boundaries from sampled frame deltas", () => {
     const scenes = deriveScenes(rawAnalysis.frames, rawAnalysis.durationSeconds, 18, 3);
 
@@ -114,5 +117,46 @@ describe("launch-video helpers", () => {
     expect(blueprint.scenes.at(-1)?.editorialRole).toBe("cta");
     expect(builder.renderStatus).toBe("pending-assets");
     expect(builder.blueprintRelativePath).toBe("blueprints/launch-style-blueprint.json");
+  });
+
+  it("builds a stable artifact path shape for a reference video", () => {
+    const fixtureDir = mkdtempSync(join(tmpdir(), "ao-launch-video-test-"));
+    const inputPath = join(fixtureDir, "test.mp4");
+    writeFileSync(inputPath, "fixture");
+
+    const result = resolveArtifactPaths(inputPath, "/tmp/artifacts/reference");
+
+    expect(result.rootDir).toBe("/tmp/artifacts/reference");
+    expect(result.referenceDir).toBe(`${result.rootDir}/reference`);
+    expect(result.analysisDir).toBe(`${result.rootDir}/analysis`);
+    expect(result.blueprintsDir).toBe(`${result.rootDir}/blueprints`);
+    expect(result.judgeDir).toBe(`${result.rootDir}/judge`);
+    expect(result.rendersDir).toBe(`${result.rootDir}/renders`);
+    expect(result.keyframesDir).toBe(`${result.rootDir}/analysis/keyframes`);
+    expect(Object.keys(result).sort()).toEqual([
+      "analysisDir",
+      "blueprintsDir",
+      "judgeDir",
+      "keyframesDir",
+      "referenceDir",
+      "rendersDir",
+      "rootDir",
+    ]);
+
+    rmSync(fixtureDir, { recursive: true, force: true });
+  });
+
+  it("points to a real bundled swift helper", () => {
+    expect(existsSync(getSwiftToolPath())).toBe(true);
+  });
+
+  it("covers the required launch family roles", () => {
+    expect(launchFamilySpecV1.map((item) => item.role)).toEqual([
+      "hook",
+      "before",
+      "after",
+      "value-beats",
+      "outro",
+    ]);
   });
 });
